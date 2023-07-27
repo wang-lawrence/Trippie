@@ -2,5 +2,8 @@
   "watch": [".env", "."],
   "events": {
     "start": "node -e 'console.clear()'"
+  },
+  "execMap": {
+    "ts": "ts-node-esm"
   }
 }
