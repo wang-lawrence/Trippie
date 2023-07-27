@@ -18,6 +18,7 @@
   },
   "include": ["."],
   "ts-node": {
-    "transpileOnly": true
+    "transpileOnly": true,
+    "esm": true
   }
 }
