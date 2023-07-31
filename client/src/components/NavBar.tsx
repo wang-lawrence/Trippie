@@ -6,15 +6,15 @@ export default function NavBar() {
       <div className="bg-gray-100 py-3">
         <div className="container">
           <nav>
-            <a href="" className="sansita text-3xl">
-              <Link to="/">Trippie</Link>
-            </a>
-            <a href="" className="roboto pl-5 text-md font-light">
-              <Link to="/trip-form">New Trip</Link>
-            </a>
-            <a href="" className="roboto pl-5 text-md font-light">
-              <Link to="/saved-trips">Saved Trips</Link>
-            </a>
+            <Link to="/" className="sansita text-3xl">
+              Trippie
+            </Link>
+            <Link to="/trip-form" className="roboto pl-5 text-md font-light">
+              New Trip
+            </Link>
+            <Link to="/saved-trips" className="roboto pl-5 text-md font-light">
+              Saved Trips
+            </Link>
             <a href="" className="roboto pl-5 text-md font-light">
               Log In
             </a>
