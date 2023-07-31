@@ -1,29 +1,23 @@
 import { useEffect, useState } from 'react';
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 import logo from './logo.svg';
 import './App.css';
+import NavBar from './components/NavBar';
+import TripEntryForm from './Pages/TripEntryForm';
+import SavedTrips from './Pages/SavedTrips';
+import NotFound from './Pages/NotFound';
 
 function App() {
-  const [serverData, setServerData] = useState('');
-
-  useEffect(() => {
-    async function readServerData() {
-      const resp = await fetch('/api/hello');
-      const data = await resp.json();
-
-      console.log('TS react - Data from server:', data);
-
-      setServerData(data.message);
-    }
-
-    readServerData();
-  }, []);
-
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <h1 className="text-gray-500 text-lg">{serverData}</h1>
-      </header>
+    <div>
+      <Routes>
+        <Route path="/" element={<NavBar />}>
+          <Route path="trip-form" element={<TripEntryForm />} />
+          <Route path="saved-trips" element={<SavedTrips />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
     </div>
   );
 }
