@@ -1,38 +1,45 @@
-.App {
-  text-align: center;
+* {
+  box-sizing: border-box;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body {
+  margin: 0;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.container {
+  padding: 0 1rem;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.sansita {
+  font-family: 'Sansita Swashed', cursive;
 }
 
-.App-link {
-  color: #61dafb;
+.roboto {
+  font-family: Roboto, sans-serif;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.bg-img {
+  background-image: url('./images/sky.jpg');
+  background-size: cover;
+  background-position-x: center;
+  background-position-y: center;
+  overflow: hidden;
+  height: calc(100vh - 51px);
+  width: 100%;
+}
+
+.bg-gold {
+  background-color: #e8aa42;
+}
+
+.bg-orange {
+  background-color: #e57c23;
+}
+
+.bg-green {
+  background-color: #025464;
+}
+
+.active {
+  font-weight: bold;
 }
