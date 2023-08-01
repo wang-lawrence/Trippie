@@ -22,26 +22,26 @@ app.use(express.static(reactStaticDir));
 app.use(express.static(uploadsStaticDir));
 app.use(express.json());
 
-app.get('/api/event/user=:userid', async (req, res) => {
-  const { userid } = req.params;
+app.get('/api/trip/:userId', async (req, res) => {
+  const { userId } = req.params;
   const sql = `
         select *
-        from "events"
-        where "userid" = $1;
+        from "trip"
+        where "userId" = $1;
   `;
-  const params = [userid];
+  const params = [userId];
   const result = await db.query(sql, params);
   const data = result.rows;
   res.json(data);
 });
 
-app.post('/api/event', async (req, res) => {
-  const { tripName, startDate, endDate } = req.body;
+app.post('/api/trip', async (req, res) => {
+  const { tripName, startDate, endDate, iconUrl } = req.body;
   const sql = `
-        insert into  "trip" ("userId", "name", "startDate", "endDate", "iconUrl")
+        insert into  "trip" ("userId", "tripName", "startDate", "endDate", "iconUrl")
         values ($1, $2, $3, $4, $5);
   `;
-  const params = [1, tripName, startDate, endDate, ''];
+  const params = [1, tripName, startDate, endDate, iconUrl];
   const result = await db.query(sql, params);
   const data = result.rows;
   res.json(data);
