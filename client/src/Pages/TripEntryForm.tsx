@@ -26,7 +26,7 @@ import {
 } from '../components/ui/popover';
 // import { toast } from "@/src/components/ui/use-toast"
 import { useState } from 'react';
-import { addEvent } from '../lib/data';
+import { addEvent, icons } from '../lib/data';
 import { useNavigate } from 'react-router-dom';
 
 const FormSchema = z.object({
@@ -61,9 +61,13 @@ export default function TripEntryForm() {
     // use 'mode: "onChange"' for edit entry form,
   });
 
+  // send form data to database
+  // it looks awkward selecting icon url in the first page, so just add a random icon url link with submission
   async function onSubmit(data: TripFormValues) {
     try {
-      await addEvent(data);
+      const randomIndex = Math.floor(Math.random() * icons.length);
+      const iconUrl = icons[randomIndex];
+      await addEvent(data, iconUrl);
     } catch (error) {
       console.error('Error Adding Event', error);
     } finally {
@@ -136,7 +140,7 @@ export default function TripEntryForm() {
                             mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
-                            numberOfMonths={2}
+                            numberOfMonths={1}
                             pagedNavigation
                             initialFocus
                           />
@@ -183,7 +187,7 @@ export default function TripEntryForm() {
                             mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
-                            numberOfMonths={2}
+                            numberOfMonths={1}
                             pagedNavigation
                             initialFocus
                           />

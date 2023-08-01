@@ -9,7 +9,7 @@ create schema "public";
 CREATE TABLE "public"."event" (
 	"eventId" serial NOT NULL,
 	"tripId" integer NOT NULL,
-	"name" TEXT NOT NULL,
+	"eventName" TEXT NOT NULL,
 	"eventDate" DATE NOT NULL,
 	"startTime" TIMESTAMP NOT NULL,
 	"endTime" TIMESTAMP NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE "public"."user" (
 CREATE TABLE "public"."trip" (
 	"tripId" serial NOT NULL,
 	"userId" integer NOT NULL,
-	"name" TEXT NOT NULL,
+	"tripName" TEXT NOT NULL,
 	"startDate" DATE NOT NULL,
 	"endDate" DATE NOT NULL,
 	"iconUrl" TEXT NOT NULL,
