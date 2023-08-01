@@ -17,8 +17,8 @@ export async function addEvent(newEvent: newEventEntry) {
     if (!res.ok) {
       throw new Error(`Error status ${res.status}`);
     }
-    // return await res.json(res);
+    return await res.json();
   } catch (error) {
-    console.log((error as Error).message);
+    console.error('Fetch Error', error);
   }
 }

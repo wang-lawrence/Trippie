@@ -61,10 +61,14 @@ export default function TripEntryForm() {
     // use 'mode: "onChange"' for edit entry form,
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log(JSON.stringify(data, null, 2));
-    addEvent(data);
-    navigate('/saved-trips');
+  async function onSubmit(data: TripFormValues) {
+    try {
+      await addEvent(data);
+    } catch (error) {
+      console.error('Error Adding Event', error);
+    } finally {
+      navigate('/saved-trips');
+    }
   }
 
   return (
