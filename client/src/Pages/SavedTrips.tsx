@@ -10,10 +10,6 @@ export default function SavedTrips() {
     async function readEvents(userId: number): Promise<void> {
       try {
         const userTrips = await getEvents(userId);
-        userTrips[0].startDate = new Date(userTrips[0].startDate);
-        userTrips[0].endDate = new Date(userTrips[0].endDate);
-        console.log(userTrips);
-        console.log('type of enddate', typeof userTrips[0].endDate);
         setTrips(userTrips);
       } catch (error) {
         console.error('Error getting events', error);

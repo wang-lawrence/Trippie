@@ -67,8 +67,6 @@ export default function TripEntryForm() {
     try {
       const randomIndex = Math.floor(Math.random() * icons.length);
       const iconUrl = icons[randomIndex];
-      // console.log(data);
-      // console.log('type of start date', typeof data.startDate)
       await addEvent(data, iconUrl);
     } catch (error) {
       console.error('Error Adding Event', error);
