@@ -25,9 +25,10 @@ import {
   PopoverTrigger,
 } from '../components/ui/popover';
 // import { toast } from "@/src/components/ui/use-toast"
-import { useState } from 'react';
-import { addTrip, icons, TripEntry } from '../lib/data';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { getTrip, updateTrip, TripEntry } from '../lib/data';
+import { useNavigate, useParams } from 'react-router-dom';
+import useFindTrip from '../hooks/useFindTrip';
 
 const FormSchema = z.object({
   tripName: z.string({
@@ -43,11 +44,17 @@ const FormSchema = z.object({
 
 type TripFormValues = z.infer<typeof FormSchema>;
 
-export default function TripEntryForm() {
-  const [tripName, setTripName] = useState<string | undefined>();
-  const [startDate, setStartDate] = useState<Date | undefined>();
-  const [endDate, setEndDate] = useState<Date | undefined>();
+type Props = {
+  editTrip: TripEntry;
+};
+
+export default function TripEditForm({ editTrip }: Props) {
+  // const {tripId} = useParams();
+  // const [tripName, setTripName] = useState<string | undefined>();
+  // const [startDate, setStartDate] = useState<Date | undefined>();
+  // const [endDate, setEndDate] = useState<Date | undefined>();
   const navigate = useNavigate();
+  const { tripId, tripName, startDate, endDate } = editTrip;
 
   const defaultValues: Partial<TripFormValues> = {
     tripName,
@@ -65,13 +72,11 @@ export default function TripEntryForm() {
   // it looks awkward selecting icon url in the first page, so just add a random icon url link with submission
   async function onSubmit(data: TripFormValues) {
     try {
-      const randomIndex = Math.floor(Math.random() * icons.length);
-      const iconUrl = icons[randomIndex];
-      await addTrip(data, iconUrl);
+      await updateTrip(data, 1, Number(tripId));
     } catch (error) {
-      console.error('Error Adding Event', error);
+      console.error('Error editing trip', error);
     } finally {
-      navigate('/saved-trips');
+      navigate(`/trip-details/${tripId}`);
     }
   }
 
@@ -201,8 +206,13 @@ export default function TripEntryForm() {
                 )}
               />
               <div className="flex justify-center">
-                <Button type="submit" className="roboto w-48 bg-gold text-lg">
-                  Submit
+                <Button
+                  type="button"
+                  className="roboto w-28 bg-gold text-lg mr-4">
+                  Cancel
+                </Button>
+                <Button type="submit" className="roboto w-28 bg-gold text-lg">
+                  Save
                 </Button>
               </div>
             </form>

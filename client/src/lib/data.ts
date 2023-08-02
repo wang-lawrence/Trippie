@@ -30,9 +30,18 @@ export type TripEntry = {
   iconUrl: string;
 };
 
-export async function getEvents(userId: number) {
+export const placeholder: TripEntry = {
+  tripId: 1,
+  userId: 1,
+  tripName: '',
+  startDate: new Date(),
+  endDate: new Date(),
+  iconUrl: 'placeholder-image',
+};
+
+export async function getAllTrips(userId: number) {
   try {
-    const res = await fetch(`/api/trip/${userId}`);
+    const res = await fetch(`/api/user/${userId}/trips`);
     if (!res.ok) {
       throw new Error(`Error status ${res.status}`);
     }
@@ -42,7 +51,19 @@ export async function getEvents(userId: number) {
   }
 }
 
-export async function addEvent(newEvent: Partial<TripEntry>, iconUrl: string) {
+export async function getTrip(userId: number, tripId: number) {
+  try {
+    const res = await fetch(`/api/user/${userId}/trip/${tripId}`);
+    if (!res.ok) {
+      throw new Error(`Error status ${res.status}`);
+    }
+    return await res.json();
+  } catch (error) {
+    console.error('Fetch Error', error);
+  }
+}
+
+export async function addTrip(newEvent: Partial<TripEntry>, iconUrl: string) {
   try {
     const reqConfig = {
       method: 'POST',
@@ -52,6 +73,29 @@ export async function addEvent(newEvent: Partial<TripEntry>, iconUrl: string) {
       body: JSON.stringify({ ...newEvent, iconUrl }),
     };
     const res = await fetch('/api/trip', reqConfig);
+    if (!res.ok) {
+      throw new Error(`Error status ${res.status}`);
+    }
+    return await res.json();
+  } catch (error) {
+    console.error('Fetch Error', error);
+  }
+}
+
+export async function updateTrip(
+  editEvent: Partial<TripEntry>,
+  userId: number,
+  tripId: number
+) {
+  try {
+    const reqConfig = {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(editEvent),
+    };
+    const res = await fetch(`/api/user/${userId}/trip/${tripId}`, reqConfig);
     if (!res.ok) {
       throw new Error(`Error status ${res.status}`);
     }

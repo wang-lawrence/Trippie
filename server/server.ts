@@ -22,7 +22,8 @@ app.use(express.static(reactStaticDir));
 app.use(express.static(uploadsStaticDir));
 app.use(express.json());
 
-app.get('/api/trip/:userId', async (req, res) => {
+// get all the trips for a user
+app.get('/api/user/:userId/trips', async (req, res) => {
   const { userId } = req.params;
   const sql = `
         select *
@@ -35,6 +36,19 @@ app.get('/api/trip/:userId', async (req, res) => {
   res.json(data);
 });
 
+app.get('/api/user/:userId/trip/:tripId', async (req, res) => {
+  const { userId, tripId } = req.params;
+  const sql = `
+        select *
+        from "trip"
+        where "userId" = $1 and "tripId" = $2;
+  `;
+  const params = [userId, tripId];
+  const result = await db.query(sql, params);
+  const data = result.rows;
+  res.json(data);
+});
+
 app.post('/api/trip', async (req, res) => {
   const { tripName, startDate, endDate, iconUrl } = req.body;
   const sql = `
@@ -42,6 +56,22 @@ app.post('/api/trip', async (req, res) => {
         values ($1, $2, $3, $4, $5);
   `;
   const params = [1, tripName, startDate, endDate, iconUrl];
+  const result = await db.query(sql, params);
+  const data = result.rows;
+  res.json(data);
+});
+
+app.put('/api/user/:userId/trip/:tripId', async (req, res) => {
+  const { userId, tripId } = req.params;
+  const { tripName, startDate, endDate } = req.body;
+  const sql = `
+        update "actors"
+           set "tripName" = $1,
+               "startDate" = $2,
+               "endDate" = $3,
+         where "userId" = $4 and "tripId" = $5;
+  `;
+  const params = [tripName, startDate, endDate, userId, tripId];
   const result = await db.query(sql, params);
   const data = result.rows;
   res.json(data);

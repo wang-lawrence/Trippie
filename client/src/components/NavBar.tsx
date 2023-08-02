@@ -4,7 +4,7 @@ export default function NavBar() {
   return (
     <>
       <div className="bg-gray-100 py-3">
-        <div className="container">
+        <div className="pl-3 md:px-8">
           <nav>
             <Link to="/" className="sansita text-3xl">
               Trippie
