@@ -85,7 +85,8 @@ export async function addTrip(newEvent: Partial<TripEntry>, iconUrl: string) {
 export async function updateTrip(
   editEvent: Partial<TripEntry>,
   userId: number,
-  tripId: number
+  tripId: number,
+  iconUrl: string
 ) {
   try {
     const reqConfig = {
@@ -93,7 +94,7 @@ export async function updateTrip(
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(editEvent),
+      body: JSON.stringify({ ...editEvent, iconUrl }),
     };
     const res = await fetch(`/api/user/${userId}/trip/${tripId}`, reqConfig);
     if (!res.ok) {

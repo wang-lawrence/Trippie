@@ -26,9 +26,8 @@ import {
 } from '../components/ui/popover';
 // import { toast } from "@/src/components/ui/use-toast"
 import { useState, useEffect } from 'react';
-import { getTrip, updateTrip, TripEntry } from '../lib/data';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import useFindTrip from '../hooks/useFindTrip';
+import { updateTrip, TripEntry } from '../lib/data';
+import { Link, useNavigate } from 'react-router-dom';
 
 const FormSchema = z.object({
   tripName: z.string({
@@ -49,12 +48,8 @@ type Props = {
 };
 
 export default function TripEditForm({ editTrip }: Props) {
-  // const {tripId} = useParams();
-  // const [tripName, setTripName] = useState<string | undefined>();
-  // const [startDate, setStartDate] = useState<Date | undefined>();
-  // const [endDate, setEndDate] = useState<Date | undefined>();
   const navigate = useNavigate();
-  const { tripId, tripName, startDate, endDate } = editTrip;
+  const { tripId, tripName, startDate, endDate, iconUrl } = editTrip;
 
   const defaultValues: Partial<TripFormValues> = {
     tripName,
@@ -71,7 +66,7 @@ export default function TripEditForm({ editTrip }: Props) {
   // send updated form data to database
   async function onSubmit(data: TripFormValues) {
     try {
-      await updateTrip(data, 1, Number(tripId));
+      await updateTrip(data, 1, Number(tripId), iconUrl);
     } catch (error) {
       console.error('Error editing trip', error);
     } finally {
