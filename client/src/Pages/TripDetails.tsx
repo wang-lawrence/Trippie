@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { Button } from '../components/ui/button';
 import {
   Popover,
-  PopoverContent,
+  PopoverContentBelowAnchor,
   PopoverTrigger,
+  PopoverClose,
 } from '../components/ui/popover';
 import { AiOutlinePlusCircle, AiOutlineMinusCircle } from 'react-icons/ai';
 import { FaMapLocationDot } from 'react-icons/fa6';
@@ -80,21 +81,23 @@ function IconPopover({ iconUrl, onClick }: IconProps) {
           <img src={iconUrl} alt="travel icon" />
         </div>
       </PopoverTrigger>
-      <PopoverContent className="w-80">
+      <PopoverContentBelowAnchor className="w-72 pr-0 mr-2">
         <div className="flex flex-wrap pt-1">
           {icons.map((icon, index) => {
             return (
-              <div
-                key={icon.slice(-7)}
-                id={icon.slice(-7)}
-                onClick={() => onClick(icon)}
-                className="h-14 w-14 p-2 mr-3 mb-2 hover:p-1 rounded-full border border-gray-200 bg-white shadow cursor-pointer">
-                <img src={icon} alt="travel icon" />
-              </div>
+              <PopoverClose>
+                <div
+                  key={icon.slice(-7)}
+                  id={icon.slice(-7)}
+                  onClick={() => onClick(icon)}
+                  className="h-14 w-14 p-2 mr-2 mb-2 hover:p-1 rounded-full border border-gray-200 bg-white shadow cursor-pointer">
+                  <img src={icon} alt="travel icon" />
+                </div>
+              </PopoverClose>
             );
           })}
         </div>
-      </PopoverContent>
+      </PopoverContentBelowAnchor>
     </Popover>
   );
 }

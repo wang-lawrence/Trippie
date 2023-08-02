@@ -20,6 +20,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  PopoverClose,
 } from '../components/ui/popover';
 // import { toast } from "@/src/components/ui/use-toast"
 import { updateTrip, TripEntry } from '../lib/data';
@@ -139,6 +140,9 @@ export default function TripEditForm({ editTrip }: Props) {
                             pagedNavigation
                             initialFocus
                           />
+                          <PopoverClose className="absolute bottom-2 right-3">
+                            <Button className="h-7">Done</Button>
+                          </PopoverClose>
                         </PopoverContent>
                       </Popover>
                     </div>
@@ -186,6 +190,9 @@ export default function TripEditForm({ editTrip }: Props) {
                             pagedNavigation
                             initialFocus
                           />
+                          <PopoverClose className="absolute bottom-2 right-">
+                            <Button className="h-7">Done</Button>
+                          </PopoverClose>
                         </PopoverContent>
                       </Popover>
                     </div>
