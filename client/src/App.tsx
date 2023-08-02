@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import React from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import logo from './logo.svg';
 import './App.css';
 import NavBar from './components/NavBar';
 import TripEntryForm from './Pages/TripEntryForm';

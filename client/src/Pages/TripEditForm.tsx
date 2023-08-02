@@ -1,5 +1,3 @@
-'use client';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
@@ -13,7 +11,6 @@ import { Input } from '../components/ui/input';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -25,13 +22,12 @@ import {
   PopoverTrigger,
 } from '../components/ui/popover';
 // import { toast } from "@/src/components/ui/use-toast"
-import { useState, useEffect } from 'react';
 import { updateTrip, TripEntry } from '../lib/data';
 import { Link, useNavigate } from 'react-router-dom';
 
 const FormSchema = z.object({
-  tripName: z.string({
-    required_error: 'Trip name is a required field.',
+  tripName: z.string().min(1, {
+    message: 'Trip name is a required field.',
   }),
   startDate: z.date({
     required_error: 'A start date is required.',
@@ -60,7 +56,7 @@ export default function TripEditForm({ editTrip }: Props) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues,
-    // use 'mode: "onChange"' for edit entry form,
+    mode: 'onChange',
   });
 
   // send updated form data to database

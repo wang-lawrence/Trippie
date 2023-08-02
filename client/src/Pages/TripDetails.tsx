@@ -7,7 +7,7 @@ import {
 } from '../components/ui/popover';
 import { AiOutlinePlusCircle, AiOutlineMinusCircle } from 'react-icons/ai';
 import { FaMapLocationDot } from 'react-icons/fa6';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { TripEntry, icons, updateTrip } from '../lib/data';
 import useFindTrip from '../hooks/useFindTrip';
 

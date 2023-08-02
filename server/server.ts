@@ -28,7 +28,8 @@ app.get('/api/user/:userId/trips', async (req, res) => {
   const sql = `
         select *
         from "trip"
-        where "userId" = $1;
+        where "userId" = $1
+        order by "startDate";
   `;
   const params = [userId];
   const result = await db.query(sql, params);
