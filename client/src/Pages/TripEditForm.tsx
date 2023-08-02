@@ -27,7 +27,7 @@ import {
 // import { toast } from "@/src/components/ui/use-toast"
 import { useState, useEffect } from 'react';
 import { getTrip, updateTrip, TripEntry } from '../lib/data';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import useFindTrip from '../hooks/useFindTrip';
 
 const FormSchema = z.object({
@@ -68,8 +68,7 @@ export default function TripEditForm({ editTrip }: Props) {
     // use 'mode: "onChange"' for edit entry form,
   });
 
-  // send form data to database
-  // it looks awkward selecting icon url in the first page, so just add a random icon url link with submission
+  // send updated form data to database
   async function onSubmit(data: TripFormValues) {
     try {
       await updateTrip(data, 1, Number(tripId));
@@ -206,11 +205,13 @@ export default function TripEditForm({ editTrip }: Props) {
                 )}
               />
               <div className="flex justify-center">
-                <Button
-                  type="button"
-                  className="roboto w-28 bg-gold text-lg mr-4">
-                  Cancel
-                </Button>
+                <Link to={`/trip-details/${tripId}`}>
+                  <Button
+                    type="button"
+                    className="roboto w-28 bg-gold text-lg mr-4">
+                    Cancel
+                  </Button>
+                </Link>
                 <Button type="submit" className="roboto w-28 bg-gold text-lg">
                   Save
                 </Button>

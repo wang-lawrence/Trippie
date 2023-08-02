@@ -65,10 +65,10 @@ app.put('/api/user/:userId/trip/:tripId', async (req, res) => {
   const { userId, tripId } = req.params;
   const { tripName, startDate, endDate } = req.body;
   const sql = `
-        update "actors"
+        update "trip"
            set "tripName" = $1,
                "startDate" = $2,
-               "endDate" = $3,
+               "endDate" = $3
          where "userId" = $4 and "tripId" = $5;
   `;
   const params = [tripName, startDate, endDate, userId, tripId];
