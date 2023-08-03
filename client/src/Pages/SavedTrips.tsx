@@ -1,22 +1,26 @@
 import { useEffect, useState } from 'react';
-import { getAllTrips, TripEntry } from '../lib/data';
+import { fetchAllTrips, TripEntry } from '../lib/data';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 
 export default function SavedTrips() {
   const [trips, setTrips] = useState<TripEntry[]>([]);
+  const [error, setError] = useState<Error>();
 
   useEffect(() => {
     async function readTrips(userId: number): Promise<void> {
       try {
-        const userTrips = await getAllTrips(userId);
+        const userTrips = await fetchAllTrips(userId);
+        console.log('fetchAllTrip', userTrips);
         setTrips(userTrips);
       } catch (error) {
-        console.error('Error getting trips', error);
+        setError(error as Error);
       }
     }
     readTrips(1);
   }, []);
+
+  if (error) return <h1>{`Fetch error: ${error.message}`}</h1>;
 
   return (
     <div className="container">
@@ -38,6 +42,10 @@ export default function SavedTrips() {
   );
 }
 
+const option = {
+  timeZone: 'UTC',
+};
+
 function TripCard({
   tripId,
   tripName,
@@ -53,7 +61,10 @@ function TripCard({
         </div>
         <div className="roboto ml-5">
           <header className="text-lg">{tripName}</header>
-          <p className="text-xs md:text-sm text-gray-400">{`${startDate?.toLocaleDateString()} - ${endDate?.toLocaleDateString()}`}</p>
+          <p className="text-xs md:text-sm text-gray-400">
+            {`${startDate?.toLocaleDateString('en-US', option)}
+            - ${endDate?.toLocaleDateString('en-US', option)}`}
+          </p>
         </div>
       </div>
     </Link>

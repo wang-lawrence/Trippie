@@ -1,22 +1,33 @@
 import { useState, useEffect } from 'react';
-import { TripEntry, getTrip, placeholder } from '../lib/data';
+import { TripEntry, fetchTrip, placeholder } from '../lib/data';
 
-export default function useFindTrip(userId: number, tripId: number): TripEntry {
+type FindTripState = {
+  trip?: TripEntry;
+  isLoading: boolean;
+  error: Error | undefined;
+};
+
+export default function useFindTrip(
+  userId: number,
+  tripId: number
+): FindTripState {
   const [trip, setTrip] = useState<TripEntry>(placeholder);
+  const [error, setError] = useState<Error | undefined>();
 
   useEffect(() => {
     async function readTrips(): Promise<void> {
       try {
-        const activeTrip = await getTrip(userId, tripId);
-        if (activeTrip.length > 0) setTrip(activeTrip[0]);
-      } catch (error) {
-        console.error('Error getting trips', error);
+        const activeTrip = await fetchTrip(userId, tripId);
+        if (activeTrip.length === 0) {
+          throw new Error('Trip not found');
+        }
+        setTrip(activeTrip[0]);
+      } catch (err) {
+        setError(err as Error);
       }
     }
     readTrips();
   }, [userId, tripId]);
 
-  if (trip.startDate) trip.startDate = new Date(trip.startDate);
-  if (trip.endDate) trip.endDate = new Date(trip.endDate);
-  return trip;
+  return { trip, error, isLoading: !trip && !error };
 }

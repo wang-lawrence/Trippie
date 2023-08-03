@@ -19,16 +19,25 @@ type TripProps = {
 export default function TripDetails({ onClick }: TripProps) {
   const [activeIcon, setActiveIcon] = useState('');
   const { tripId } = useParams();
-  const trip = useFindTrip(1, Number(tripId));
-  const { tripName, startDate, endDate, iconUrl } = trip;
+  const { trip, error, isLoading } = useFindTrip(1, Number(tripId));
 
   useEffect(() => {
-    setActiveIcon(iconUrl);
-  }, [iconUrl]);
+    if (trip) setActiveIcon(trip.iconUrl);
+  }, [trip]);
+
+  if (isLoading) {
+    return <h1>Temporary Loading Page...</h1>;
+  }
+  if (error || !trip) {
+    return <h1>{error?.message}</h1>;
+  }
+  const { tripName, startDate, endDate } = trip;
 
   function handleIconChange(icon: string) {
     setActiveIcon(icon);
-    updateTrip(trip, 1, trip.tripId, icon);
+    if (trip) {
+      updateTrip({ ...trip, userId: 1, tripId: Number(tripId), iconUrl: icon });
+    }
   }
 
   return (
@@ -85,10 +94,8 @@ function IconPopover({ iconUrl, onClick }: IconProps) {
         <div className="flex flex-wrap pt-1">
           {icons.map((icon, index) => {
             return (
-              <PopoverClose>
+              <PopoverClose key={index}>
                 <div
-                  key={icon.slice(-7)}
-                  id={icon.slice(-7)}
                   onClick={() => onClick(icon)}
                   className="h-14 w-14 p-2 mr-2 mb-2 hover:p-1 rounded-full border border-gray-200 bg-white shadow cursor-pointer">
                   <img src={icon} alt="travel icon" />

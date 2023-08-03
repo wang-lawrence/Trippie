@@ -23,6 +23,7 @@ import {
   PopoverClose,
 } from '../components/ui/popover';
 // import { toast } from "@/src/components/ui/use-toast"
+import { useState } from 'react';
 import { updateTrip, TripEntry } from '../lib/data';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -45,8 +46,12 @@ type Props = {
 };
 
 export default function TripEditForm({ editTrip }: Props) {
+  const [error, setError] = useState<Error>();
   const navigate = useNavigate();
   const { tripId, tripName, startDate, endDate, iconUrl } = editTrip;
+
+  console.log('startDate', startDate);
+  console.log('endDate', endDate);
 
   const defaultValues: Partial<TripFormValues> = {
     tripName,
@@ -63,13 +68,15 @@ export default function TripEditForm({ editTrip }: Props) {
   // send updated form data to database
   async function onSubmit(data: TripFormValues) {
     try {
-      await updateTrip(data, 1, Number(tripId), iconUrl);
+      await updateTrip({ ...data, userId: 1, tripId: Number(tripId), iconUrl });
     } catch (error) {
-      console.error('Error editing trip', error);
+      setError(error as Error);
     } finally {
       navigate(`/trip-details/${tripId}`);
     }
   }
+
+  if (error) return <h1>{`Fetch Error: ${error.message}`}</h1>;
 
   return (
     <div className="bg-img">
@@ -131,7 +138,9 @@ export default function TripEditForm({ editTrip }: Props) {
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
+                        <PopoverContent
+                          className="w-auto p-0 relative"
+                          align="start">
                           <Calendar
                             mode="single"
                             selected={field.value}
@@ -140,7 +149,7 @@ export default function TripEditForm({ editTrip }: Props) {
                             pagedNavigation
                             initialFocus
                           />
-                          <PopoverClose className="absolute bottom-2 right-3">
+                          <PopoverClose className="absolute bottom-2 right-5">
                             <Button className="h-7">Done</Button>
                           </PopoverClose>
                         </PopoverContent>
@@ -181,7 +190,9 @@ export default function TripEditForm({ editTrip }: Props) {
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
+                        <PopoverContent
+                          className="w-auto p-0 relative"
+                          align="start">
                           <Calendar
                             mode="single"
                             selected={field.value}
@@ -190,7 +201,7 @@ export default function TripEditForm({ editTrip }: Props) {
                             pagedNavigation
                             initialFocus
                           />
-                          <PopoverClose className="absolute bottom-2 right-">
+                          <PopoverClose className="absolute bottom-2 right-5">
                             <Button className="h-7">Done</Button>
                           </PopoverClose>
                         </PopoverContent>

@@ -23,6 +23,7 @@ import {
   PopoverClose,
 } from '../components/ui/popover';
 // import { toast } from "@/src/components/ui/use-toast"
+import { useState } from 'react';
 import { addTrip, icons } from '../lib/data';
 import { useNavigate } from 'react-router-dom';
 
@@ -41,6 +42,7 @@ const FormSchema = z.object({
 type TripFormValues = z.infer<typeof FormSchema>;
 
 export default function TripEntryForm() {
+  const [error, setError] = useState<Error>();
   const navigate = useNavigate();
 
   const defaultValues: Partial<TripFormValues> = {
@@ -60,13 +62,15 @@ export default function TripEntryForm() {
     try {
       const randomIndex = Math.floor(Math.random() * icons.length);
       const iconUrl = icons[randomIndex];
-      await addTrip(data, iconUrl);
+      await addTrip({ ...data, iconUrl });
     } catch (error) {
-      console.error('Error Adding Event', error);
+      setError(error as Error);
     } finally {
       navigate('/saved-trips');
     }
   }
+
+  if (error) return <h1>{`Fetch error ${error.message}`}</h1>;
 
   return (
     <div className="bg-img">
@@ -129,7 +133,8 @@ export default function TripEntryForm() {
                           </FormControl>
                         </PopoverTrigger>
                         <PopoverContent
-                          className="w-auto p-0 relative"
+                          className="w-auto p-0 "
+                          // relative
                           align="start">
                           <Calendar
                             mode="single"
@@ -139,9 +144,9 @@ export default function TripEntryForm() {
                             pagedNavigation
                             initialFocus
                           />
-                          <PopoverClose className="absolute bottom-2 right-5">
+                          {/* <PopoverClose className="absolute bottom-2 right-5">
                             <Button className="h-7">Done</Button>
-                          </PopoverClose>
+                          </PopoverClose> */}
                         </PopoverContent>
                       </Popover>
                     </div>
@@ -180,7 +185,9 @@ export default function TripEntryForm() {
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
+                        <PopoverContent
+                          className="w-auto p-0 relative"
+                          align="start">
                           <Calendar
                             mode="single"
                             selected={field.value}
@@ -189,7 +196,7 @@ export default function TripEntryForm() {
                             pagedNavigation
                             initialFocus
                           />
-                          <PopoverClose className="absolute bottom-2 right-3">
+                          <PopoverClose className="absolute bottom-2 right-5">
                             <Button className="h-7">Done</Button>
                           </PopoverClose>
                         </PopoverContent>
