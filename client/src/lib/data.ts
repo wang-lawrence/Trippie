@@ -21,12 +21,6 @@ export const icons = [
   '/images/travel-vector-free-icon-set-40.png',
 ];
 
-export function formatDate(date: Date) {
-  return `${date.getUTCMonth()}/${date.getUTCDate()}/${
-    date.getUTCFullYear() % 100
-  }`;
-}
-
 export type TripEntry = {
   tripId: number;
   userId: number;

@@ -43,8 +43,8 @@ CREATE TABLE "public"."trip" (
 	"tripId" serial NOT NULL,
 	"userId" integer NOT NULL,
 	"tripName" TEXT NOT NULL,
-	"startDate" DATE NOT NULL,
-	"endDate" DATE NOT NULL,
+	"startDate" timestamptz NOT NULL,
+	"endDate" timestamptz NOT NULL,
 	"iconUrl" TEXT NOT NULL,
 	CONSTRAINT "trip_pk" PRIMARY KEY ("tripId")
 ) WITH (

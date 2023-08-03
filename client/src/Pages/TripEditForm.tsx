@@ -50,9 +50,6 @@ export default function TripEditForm({ editTrip }: Props) {
   const navigate = useNavigate();
   const { tripId, tripName, startDate, endDate, iconUrl } = editTrip;
 
-  console.log('startDate', startDate);
-  console.log('endDate', endDate);
-
   const defaultValues: Partial<TripFormValues> = {
     tripName,
     startDate,
@@ -149,7 +146,7 @@ export default function TripEditForm({ editTrip }: Props) {
                             pagedNavigation
                             initialFocus
                           />
-                          <PopoverClose className="absolute bottom-2 right-5">
+                          <PopoverClose className="absolute bottom-3 right-5">
                             <Button className="h-7">Done</Button>
                           </PopoverClose>
                         </PopoverContent>
@@ -201,7 +198,7 @@ export default function TripEditForm({ editTrip }: Props) {
                             pagedNavigation
                             initialFocus
                           />
-                          <PopoverClose className="absolute bottom-2 right-5">
+                          <PopoverClose className="absolute bottom-3 right-5">
                             <Button className="h-7">Done</Button>
                           </PopoverClose>
                         </PopoverContent>

@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+import { DateTime } from 'luxon';
 
 import { cn } from '../lib/utils';
 import { Button } from '../components/ui/button';
@@ -62,7 +63,8 @@ export default function TripEntryForm() {
     try {
       const randomIndex = Math.floor(Math.random() * icons.length);
       const iconUrl = icons[randomIndex];
-      await addTrip({ ...data, iconUrl });
+
+      await addTrip({ ...data, userId: 1, iconUrl });
     } catch (error) {
       setError(error as Error);
     } finally {
@@ -144,9 +146,9 @@ export default function TripEntryForm() {
                             pagedNavigation
                             initialFocus
                           />
-                          {/* <PopoverClose className="absolute bottom-2 right-5">
+                          <PopoverClose className="absolute bottom-3 right-5">
                             <Button className="h-7">Done</Button>
-                          </PopoverClose> */}
+                          </PopoverClose>
                         </PopoverContent>
                       </Popover>
                     </div>
@@ -196,7 +198,7 @@ export default function TripEntryForm() {
                             pagedNavigation
                             initialFocus
                           />
-                          <PopoverClose className="absolute bottom-2 right-5">
+                          <PopoverClose className="absolute bottom-3 right-5">
                             <Button className="h-7">Done</Button>
                           </PopoverClose>
                         </PopoverContent>

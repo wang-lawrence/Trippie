@@ -52,13 +52,13 @@ app.get('/api/user/:userId/trip/:tripId', async (req, res) => {
 });
 
 app.post('/api/trip', async (req, res) => {
-  const { tripName, startDate, endDate, iconUrl } = req.body;
+  const { userId, tripName, startDate, endDate, iconUrl } = req.body;
   const sql = `
         insert into  "trip" ("userId", "tripName", "startDate", "endDate", "iconUrl")
         values ($1, $2, $3, $4, $5)
         returning *;
   `;
-  const params = [1, tripName, startDate, endDate, iconUrl];
+  const params = [userId, tripName, startDate, endDate, iconUrl];
   const result = await db.query(sql, params);
   const data = result.rows;
   res.json(data);

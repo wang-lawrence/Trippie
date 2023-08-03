@@ -42,10 +42,6 @@ export default function SavedTrips() {
   );
 }
 
-const option = {
-  timeZone: 'UTC',
-};
-
 function TripCard({
   tripId,
   tripName,
@@ -62,8 +58,8 @@ function TripCard({
         <div className="roboto ml-5">
           <header className="text-lg">{tripName}</header>
           <p className="text-xs md:text-sm text-gray-400">
-            {`${startDate?.toLocaleDateString('en-US', option)}
-            - ${endDate?.toLocaleDateString('en-US', option)}`}
+            {`${startDate?.toLocaleDateString()}
+            - ${endDate?.toLocaleDateString()}`}
           </p>
         </div>
       </div>
