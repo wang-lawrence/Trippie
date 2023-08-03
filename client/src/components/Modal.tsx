@@ -9,11 +9,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from './ui/alert-dialog';
-import { Button } from './ui/button';
 import { ReactNode } from 'react';
 
 type ModalProps = {
-  // modalTrigger: ReactNode;
   children: ReactNode;
   onContClick: () => Promise<void>;
   deleteName: string;
