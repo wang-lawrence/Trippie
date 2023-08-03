@@ -11,7 +11,6 @@ export default function SavedTrips() {
     async function readTrips(userId: number): Promise<void> {
       try {
         const userTrips = await fetchAllTrips(userId);
-        console.log('fetchAllTrip', userTrips);
         setTrips(userTrips);
       } catch (error) {
         setError(error as Error);

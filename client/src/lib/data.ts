@@ -80,9 +80,6 @@ export async function addTrip(
 
 export async function updateTrip(
   editTrip: Partial<TripEntry>
-  // userId: number,
-  // tripId: number,
-  // iconUrl: string
 ): Promise<TripEntry[]> {
   const reqConfig = {
     method: 'PUT',
@@ -95,6 +92,20 @@ export async function updateTrip(
     `/api/user/${editTrip.userId}/trip/${editTrip.tripId}`,
     reqConfig
   );
+  if (!res.ok) {
+    throw new Error(`Error status ${res.status}`);
+  }
+  return await res.json();
+}
+
+export async function deleteTrip(
+  userId: number,
+  tripId: number
+): Promise<TripEntry[]> {
+  const reqConfig = {
+    method: 'DELETE',
+  };
+  const res = await fetch(`/api/user/${userId}/trip/${tripId}`, reqConfig);
   if (!res.ok) {
     throw new Error(`Error status ${res.status}`);
   }
