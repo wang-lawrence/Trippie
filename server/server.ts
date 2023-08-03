@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import errorMiddleware from './lib/error-middleware.js';
+import ClientError from './lib/client-error.js';
 import pg from 'pg';
 
 // eslint-disable-next-line no-unused-vars -- Remove when used
@@ -22,12 +23,14 @@ app.use(express.static(reactStaticDir));
 app.use(express.static(uploadsStaticDir));
 app.use(express.json());
 
-app.get('/api/trip/:userId', async (req, res) => {
+// get all the trips for a user
+app.get('/api/user/:userId/trips', async (req, res) => {
   const { userId } = req.params;
   const sql = `
         select *
         from "trip"
-        where "userId" = $1;
+        where "userId" = $1
+        order by "startDate";
   `;
   const params = [userId];
   const result = await db.query(sql, params);
@@ -35,16 +38,66 @@ app.get('/api/trip/:userId', async (req, res) => {
   res.json(data);
 });
 
-app.post('/api/trip', async (req, res) => {
-  const { tripName, startDate, endDate, iconUrl } = req.body;
+app.get('/api/user/:userId/trip/:tripId', async (req, res) => {
+  const { userId, tripId } = req.params;
   const sql = `
-        insert into  "trip" ("userId", "tripName", "startDate", "endDate", "iconUrl")
-        values ($1, $2, $3, $4, $5);
+        select *
+        from "trip"
+        where "userId" = $1 and "tripId" = $2;
   `;
-  const params = [1, tripName, startDate, endDate, iconUrl];
+  const params = [userId, tripId];
   const result = await db.query(sql, params);
   const data = result.rows;
   res.json(data);
+});
+
+app.post('/api/trip', async (req, res) => {
+  const { userId, tripName, startDate, endDate, iconUrl } = req.body;
+  const sql = `
+        insert into  "trip" ("userId", "tripName", "startDate", "endDate", "iconUrl")
+        values ($1, $2, $3, $4, $5)
+        returning *;
+  `;
+  const params = [userId, tripName, startDate, endDate, iconUrl];
+  const result = await db.query(sql, params);
+  const data = result.rows;
+  res.json(data);
+});
+
+app.put('/api/user/:userId/trip/:tripId', async (req, res, next) => {
+  try {
+    const { userId, tripId } = req.params;
+    const { tripName, startDate, endDate, iconUrl } = req.body;
+    if (
+      !Number(userId) ||
+      !Number(tripId) ||
+      !tripName ||
+      !startDate ||
+      !endDate ||
+      !iconUrl
+    ) {
+      throw new ClientError(400, 'Missing parameter');
+    }
+    const sql = `
+          update "trip"
+            set "tripName" = $1,
+                "startDate" = $2,
+                "endDate" = $3,
+                "iconUrl" = $4
+          where "userId" = $5 and "tripId" = $6
+          returning *;
+    `;
+    const params = [tripName, startDate, endDate, iconUrl, userId, tripId];
+    const result = await db.query(sql, params);
+    const data = result.rows[0];
+    if (data) {
+      res.status(200).json(data);
+    } else {
+      throw new ClientError(404, `Cannot find trip with 'tripId' ${tripId}`);
+    }
+  } catch (err) {
+    next(err);
+  }
 });
 
 /**

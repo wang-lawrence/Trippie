@@ -1,29 +1,34 @@
 import { useEffect, useState } from 'react';
-import { getEvents, TripEntry } from '../lib/data';
+import { fetchAllTrips, TripEntry } from '../lib/data';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 
 export default function SavedTrips() {
   const [trips, setTrips] = useState<TripEntry[]>([]);
+  const [error, setError] = useState<Error>();
 
   useEffect(() => {
-    async function readEvents(userId: number): Promise<void> {
+    async function readTrips(userId: number): Promise<void> {
       try {
-        const userTrips = await getEvents(userId);
+        const userTrips = await fetchAllTrips(userId);
+        console.log('fetchAllTrip', userTrips);
         setTrips(userTrips);
       } catch (error) {
-        console.error('Error getting events', error);
+        setError(error as Error);
       }
     }
-    readEvents(1);
+    readTrips(1);
   }, []);
+
+  if (error) return <h1>{`Fetch error: ${error.message}`}</h1>;
 
   return (
     <div className="container">
       {trips.length ? (
         trips.map(({ tripId, tripName, startDate, endDate, iconUrl }) => (
-          <SavedTripCard
+          <TripCard
             key={tripId}
+            tripId={tripId}
             tripName={tripName}
             startDate={new Date(startDate)}
             endDate={new Date(endDate)}
@@ -37,22 +42,28 @@ export default function SavedTrips() {
   );
 }
 
-function SavedTripCard({
+function TripCard({
+  tripId,
   tripName,
   startDate,
   endDate,
   iconUrl,
 }: Partial<TripEntry>) {
   return (
-    <div className="h-24 w-full px-5 mt-4 bg-[#F8F1F1] flex items-center rounded-md border border-gray-200 shadow">
-      <div className="h-16 w-16 p-1 rounded-full border border-gray-200 bg-white shadow">
-        <img src={iconUrl} alt="travel icon" />
+    <Link to={`/trip-details/${tripId}`}>
+      <div className="h-24 w-full px-5 mt-4 bg-[#F8F1F1] flex items-center rounded-md border border-gray-200 shadow cursor-pointer hover:shadow-md hover:outline hover:outline-slate-200">
+        <div className="h-16 w-16 p-2 rounded-full border border-gray-200 bg-white shadow">
+          <img src={iconUrl} alt="travel icon" />
+        </div>
+        <div className="roboto ml-5">
+          <header className="text-lg">{tripName}</header>
+          <p className="text-xs md:text-sm text-gray-400">
+            {`${startDate?.toLocaleDateString()}
+            - ${endDate?.toLocaleDateString()}`}
+          </p>
+        </div>
       </div>
-      <div className="roboto ml-5">
-        <header className="text-lg">{tripName}</header>
-        <p className="text-xs md:text-sm text-gray-400">{`${startDate?.toLocaleDateString()} - ${endDate?.toLocaleDateString()}`}</p>
-      </div>
-    </div>
+    </Link>
   );
 }
 

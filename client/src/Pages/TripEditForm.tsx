@@ -3,7 +3,6 @@ import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { DateTime } from 'luxon';
 
 import { cn } from '../lib/utils';
 import { Button } from '../components/ui/button';
@@ -25,8 +24,8 @@ import {
 } from '../components/ui/popover';
 // import { toast } from "@/src/components/ui/use-toast"
 import { useState } from 'react';
-import { addTrip, icons } from '../lib/data';
-import { useNavigate } from 'react-router-dom';
+import { updateTrip, TripEntry } from '../lib/data';
+import { Link, useNavigate } from 'react-router-dom';
 
 const FormSchema = z.object({
   tripName: z.string().min(1, {
@@ -42,37 +41,39 @@ const FormSchema = z.object({
 
 type TripFormValues = z.infer<typeof FormSchema>;
 
-export default function TripEntryForm() {
+type Props = {
+  editTrip: TripEntry;
+};
+
+export default function TripEditForm({ editTrip }: Props) {
   const [error, setError] = useState<Error>();
   const navigate = useNavigate();
+  const { tripId, tripName, startDate, endDate, iconUrl } = editTrip;
 
   const defaultValues: Partial<TripFormValues> = {
-    tripName: undefined,
-    startDate: undefined,
-    endDate: undefined,
+    tripName,
+    startDate,
+    endDate,
   };
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues,
+    mode: 'onChange',
   });
 
-  // send form data to database
-  // it looks awkward selecting icon url in the first page, so just add a random icon url link with submission
+  // send updated form data to database
   async function onSubmit(data: TripFormValues) {
     try {
-      const randomIndex = Math.floor(Math.random() * icons.length);
-      const iconUrl = icons[randomIndex];
-
-      await addTrip({ ...data, userId: 1, iconUrl });
+      await updateTrip({ ...data, userId: 1, tripId: Number(tripId), iconUrl });
     } catch (error) {
       setError(error as Error);
     } finally {
-      navigate('/saved-trips');
+      navigate(`/trip-details/${tripId}`);
     }
   }
 
-  if (error) return <h1>{`Fetch error ${error.message}`}</h1>;
+  if (error) return <h1>{`Fetch Error: ${error.message}`}</h1>;
 
   return (
     <div className="bg-img">
@@ -135,8 +136,7 @@ export default function TripEntryForm() {
                           </FormControl>
                         </PopoverTrigger>
                         <PopoverContent
-                          className="w-auto p-0 "
-                          // relative
+                          className="w-auto p-0 relative"
                           align="start">
                           <Calendar
                             mode="single"
@@ -211,8 +211,15 @@ export default function TripEntryForm() {
                 )}
               />
               <div className="flex justify-center">
-                <Button type="submit" className="roboto w-48 bg-gold text-lg">
-                  Submit
+                <Link to={`/trip-details/${tripId}`}>
+                  <Button
+                    type="button"
+                    className="roboto w-28 bg-gold text-lg mr-4">
+                    Cancel
+                  </Button>
+                </Link>
+                <Button type="submit" className="roboto w-28 bg-gold text-lg">
+                  Save
                 </Button>
               </div>
             </form>

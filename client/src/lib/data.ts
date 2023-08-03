@@ -30,33 +30,73 @@ export type TripEntry = {
   iconUrl: string;
 };
 
-export async function getEvents(userId: number) {
-  try {
-    const res = await fetch(`/api/trip/${userId}`);
-    if (!res.ok) {
-      throw new Error(`Error status ${res.status}`);
-    }
-    return await res.json();
-  } catch (error) {
-    console.error('Fetch Error', error);
+export const placeholder: TripEntry = {
+  tripId: 1,
+  userId: 1,
+  tripName: '',
+  startDate: new Date(),
+  endDate: new Date(),
+  iconUrl: 'placeholder-image',
+};
+
+export async function fetchAllTrips(userId: number): Promise<TripEntry[]> {
+  const res = await fetch(`/api/user/${userId}/trips`);
+  if (!res.ok) {
+    throw new Error(`Error status ${res.status}`);
   }
+  return await res.json();
 }
 
-export async function addEvent(newEvent: Partial<TripEntry>, iconUrl: string) {
-  try {
-    const reqConfig = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ ...newEvent, iconUrl }),
-    };
-    const res = await fetch('/api/trip', reqConfig);
-    if (!res.ok) {
-      throw new Error(`Error status ${res.status}`);
-    }
-    return await res.json();
-  } catch (error) {
-    console.error('Fetch Error', error);
+export async function fetchTrip(
+  userId: number,
+  tripId: number
+): Promise<TripEntry[]> {
+  const res = await fetch(`/api/user/${userId}/trip/${tripId}`);
+  if (!res.ok) {
+    throw new Error(`Error status ${res.status}`);
   }
+  const trip = await res.json();
+  trip[0].startDate = new Date(trip[0].startDate);
+  trip[0].endDate = new Date(trip[0].endDate);
+  return trip;
+}
+
+export async function addTrip(
+  newEvent: Partial<TripEntry>
+): Promise<TripEntry[]> {
+  const reqConfig = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(newEvent),
+  };
+  const res = await fetch('/api/trip', reqConfig);
+  if (!res.ok) {
+    throw new Error(`Error status ${res.status}`);
+  }
+  return await res.json();
+}
+
+export async function updateTrip(
+  editTrip: Partial<TripEntry>
+  // userId: number,
+  // tripId: number,
+  // iconUrl: string
+): Promise<TripEntry[]> {
+  const reqConfig = {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(editTrip),
+  };
+  const res = await fetch(
+    `/api/user/${editTrip.userId}/trip/${editTrip.tripId}`,
+    reqConfig
+  );
+  if (!res.ok) {
+    throw new Error(`Error status ${res.status}`);
+  }
+  return await res.json();
 }
