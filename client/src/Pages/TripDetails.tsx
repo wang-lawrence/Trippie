@@ -18,25 +18,37 @@ type TripProps = {
 
 export default function TripDetails({ onClick }: TripProps) {
   const [activeIcon, setActiveIcon] = useState('');
+  const [err, setError] = useState<Error>();
   const { tripId } = useParams();
   const { trip, error, isLoading } = useFindTrip(1, Number(tripId));
 
   useEffect(() => {
     if (trip) setActiveIcon(trip.iconUrl);
-  }, [trip]);
+    if (error) setError(error);
+  }, [trip, error]);
 
   if (isLoading) {
     return <h1>Temporary Loading Page...</h1>;
   }
-  if (error || !trip) {
-    return <h1>{error?.message}</h1>;
+  if (err || !trip) {
+    return <h1>{err?.message}</h1>;
   }
+
   const { tripName, startDate, endDate } = trip;
 
-  function handleIconChange(icon: string) {
+  async function handleIconChange(icon: string) {
     setActiveIcon(icon);
     if (trip) {
-      updateTrip({ ...trip, userId: 1, tripId: Number(tripId), iconUrl: icon });
+      try {
+        await updateTrip({
+          ...trip,
+          userId: 1,
+          tripId: Number(tripId),
+          iconUrl: icon,
+        });
+      } catch (error) {
+        setError(error as Error);
+      }
     }
   }
 
