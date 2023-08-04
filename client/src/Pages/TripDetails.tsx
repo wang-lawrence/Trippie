@@ -6,10 +6,11 @@ import {
   PopoverTrigger,
   PopoverClose,
 } from '../components/ui/popover';
+import { Modal } from '../components/Modal';
 import { AiOutlinePlusCircle, AiOutlineMinusCircle } from 'react-icons/ai';
 import { FaMapLocationDot } from 'react-icons/fa6';
-import { useParams } from 'react-router-dom';
-import { TripEntry, icons, updateTrip } from '../lib/data';
+import { useParams, useNavigate } from 'react-router-dom';
+import { TripEntry, icons, updateTrip, deleteTrip } from '../lib/data';
 import useFindTrip from '../hooks/useFindTrip';
 
 type TripProps = {
@@ -18,25 +19,48 @@ type TripProps = {
 
 export default function TripDetails({ onClick }: TripProps) {
   const [activeIcon, setActiveIcon] = useState('');
+  const [err, setError] = useState<Error>();
   const { tripId } = useParams();
+  const navigate = useNavigate();
   const { trip, error, isLoading } = useFindTrip(1, Number(tripId));
 
   useEffect(() => {
     if (trip) setActiveIcon(trip.iconUrl);
-  }, [trip]);
+    if (error) setError(error);
+  }, [trip, error]);
 
   if (isLoading) {
     return <h1>Temporary Loading Page...</h1>;
   }
-  if (error || !trip) {
-    return <h1>{error?.message}</h1>;
+  if (err || !trip) {
+    return <h1>{err?.message}</h1>;
   }
+
   const { tripName, startDate, endDate } = trip;
 
-  function handleIconChange(icon: string) {
+  async function handleIconChange(icon: string) {
     setActiveIcon(icon);
     if (trip) {
-      updateTrip({ ...trip, userId: 1, tripId: Number(tripId), iconUrl: icon });
+      try {
+        await updateTrip({
+          ...trip,
+          userId: 1,
+          tripId: Number(tripId),
+          iconUrl: icon,
+        });
+      } catch (error) {
+        setError(error as Error);
+      }
+    }
+  }
+
+  async function handleDeleteTrip() {
+    try {
+      await deleteTrip(1, Number(tripId));
+    } catch (error) {
+      setError(error as Error);
+    } finally {
+      navigate('/saved-trips');
     }
   }
 
@@ -62,9 +86,11 @@ export default function TripDetails({ onClick }: TripProps) {
         <Button className="bg-gold w-1/3 max-w-[120px] mx-7">
           Map <FaMapLocationDot className="ml-2" />
         </Button>
-        <Button className="bg-orange w-1/3 max-w-[120px]">
-          Delete <AiOutlineMinusCircle className="ml-2" />
-        </Button>
+        <Modal onContClick={handleDeleteTrip} deleteName={tripName}>
+          <Button className="bg-orange w-1/3 max-w-[120px]">
+            Delete <AiOutlineMinusCircle className="ml-2" />
+          </Button>
+        </Modal>
       </section>
       <section className="mt-3 ">
         <header>Day 1 - 11/09/23</header>

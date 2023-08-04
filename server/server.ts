@@ -66,16 +66,10 @@ app.post('/api/trip', async (req, res) => {
 
 app.put('/api/user/:userId/trip/:tripId', async (req, res, next) => {
   try {
-    const { userId, tripId } = req.params;
+    const userId = Number(req.params.userId);
+    const tripId = Number(req.params.tripId);
     const { tripName, startDate, endDate, iconUrl } = req.body;
-    if (
-      !Number(userId) ||
-      !Number(tripId) ||
-      !tripName ||
-      !startDate ||
-      !endDate ||
-      !iconUrl
-    ) {
+    if (!userId || !tripId || !tripName || !startDate || !endDate || !iconUrl) {
       throw new ClientError(400, 'Missing parameter');
     }
     const sql = `
@@ -93,7 +87,33 @@ app.put('/api/user/:userId/trip/:tripId', async (req, res, next) => {
     if (data) {
       res.status(200).json(data);
     } else {
-      throw new ClientError(404, `Cannot find trip with 'tripId' ${tripId}`);
+      throw new ClientError(404, `Cannot find trip`);
+    }
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.delete('/api/user/:userId/trip/:tripId', async (req, res, next) => {
+  try {
+    const userId = Number(req.params.userId);
+    const tripId = Number(req.params.tripId);
+    if (!Number.isInteger(userId) || !Number.isInteger(tripId)) {
+      throw new ClientError(400, 'Missing user or trip parameters');
+    }
+    const sql = `
+            delete
+              from "trip"
+              where "userId" = $1 and "tripId" = $2
+              returning *;
+          `;
+    const params = [userId, tripId];
+    const result = await db.query(sql, params);
+    const trip = result.rows[0];
+    if (trip) {
+      res.sendStatus(204);
+    } else {
+      throw new ClientError(404, `Cannot find trip`);
     }
   } catch (err) {
     next(err);
