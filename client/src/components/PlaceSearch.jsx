@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Autocomplete,
   useLoadScript,
@@ -6,21 +6,23 @@ import {
 } from '@react-google-maps/api';
 const googleMapsLibraries: LoadScriptProps['libraries'] = ['places'];
 
-function App() {
-  const [searchResult, setSearchResult] = useState('Result: none');
+export default function PlaceSearch() {
+  const [searchResult, setSearchResult] = useState();
+  const ref = useRef();
 
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: 'API_KEY_HERE',
+    googleMapsApiKey: 'AIzaSyB2hMYygS2AnFwCoVEmMApfPdCQ8GKbOdY',
     libraries: googleMapsLibraries,
   });
 
-  function onLoad(autocomplete: any) {
+  function onLoad(autocomplete) {
     setSearchResult(autocomplete);
-    console.log(autocomplete.getPlace());
+    console.log('autocomplete: ', autocomplete);
   }
 
   function onPlaceChanged() {
-    if (searchResult != null) {
+    if (searchResult !== undefined) {
+      console.log(searchResult.getPlace());
       // const place = searchResult.getPlace();
       // const name = place.name;
       // const status = place.business_status;
@@ -41,9 +43,10 @@ function App() {
   return (
     <div className="App">
       <div id="searchColumn">
-        <h2>Tide Forecast Options</h2>
+        <h2>Location</h2>
         <Autocomplete onPlaceChanged={onPlaceChanged} onLoad={onLoad}>
           <input
+            ref={ref}
             type="text"
             placeholder="Search for Tide Information"
             style={{
@@ -64,5 +67,3 @@ function App() {
     </div>
   );
 }
-
-export default App;

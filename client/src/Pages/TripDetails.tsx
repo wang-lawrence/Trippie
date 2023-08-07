@@ -9,7 +9,7 @@ import {
 import { Modal } from '../components/Modal';
 import { AiOutlinePlusCircle, AiOutlineMinusCircle } from 'react-icons/ai';
 import { FaMapLocationDot } from 'react-icons/fa6';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { TripEntry, icons, updateTrip, deleteTrip } from '../lib/data';
 import useFindTrip from '../hooks/useFindTrip';
 
@@ -80,9 +80,11 @@ export default function TripDetails({ onClick }: TripProps) {
         <IconPopover iconUrl={activeIcon} onClick={handleIconChange} />
       </header>
       <section className="flex justify-center mt-3">
-        <Button className="bg-green w-1/3 max-w-[150px] min-w-[120px]">
-          Add Event <AiOutlinePlusCircle className="ml-2" />
-        </Button>
+        <Link to={`event-form/${tripId}/start/${startDate}/end/${endDate}`}>
+          <Button className="bg-green w-1/3 max-w-[150px] min-w-[120px]">
+            Add Event <AiOutlinePlusCircle className="ml-2" />
+          </Button>
+        </Link>
         <Button className="bg-gold w-1/3 max-w-[120px] mx-7">
           Map <FaMapLocationDot className="ml-2" />
         </Button>
