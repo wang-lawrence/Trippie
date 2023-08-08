@@ -65,8 +65,8 @@ export default function TripDetails({ onClick }: TripProps) {
   }
 
   return (
-    <div className="container roboto">
-      <header className="flex justify-center content-center mt-3">
+    <div className="container roboto bg-white">
+      <header className="flex justify-center content-center">
         <div
           onClick={() => onClick(trip)}
           className="text-center hover:underline cursor-pointer">

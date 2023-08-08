@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
 import {
   Autocomplete,
   useLoadScript,
   LoadScriptProps,
 } from '@react-google-maps/api';
+import { Label } from './ui/label';
 const googleMapsLibraries: LoadScriptProps['libraries'] = ['places'];
 
 type PlaceSearchProps = {
@@ -17,8 +17,6 @@ export type GPlace = {
 };
 
 export default function PlaceSearch({ onChange, newPlace }: PlaceSearchProps) {
-  // const [searchResult, setSearchResult] = useState<gPlace>();
-
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: 'AIzaSyB2hMYygS2AnFwCoVEmMApfPdCQ8GKbOdY',
     libraries: googleMapsLibraries,
@@ -44,12 +42,13 @@ export default function PlaceSearch({ onChange, newPlace }: PlaceSearchProps) {
   return (
     <div className="App">
       <div id="searchColumn">
-        <h2>Location</h2>
+        <Label htmlFor="location">Location</Label>
         <Autocomplete onPlaceChanged={onPlaceChanged} onLoad={onLoad}>
           <input
+            id="location"
             type="text"
             className={
-              'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+              'mb-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
             }
           />
         </Autocomplete>
