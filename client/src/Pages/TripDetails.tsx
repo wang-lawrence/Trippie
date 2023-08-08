@@ -25,8 +25,9 @@ export default function TripDetails({ onClick }: TripProps) {
   const { trip, error, isLoading } = useFindTrip(1, Number(tripId));
 
   useEffect(() => {
-    if (trip) setActiveIcon(trip.iconUrl);
+    if (trip) setActiveIcon(trip[0].iconUrl);
     if (error) setError(error);
+    console.log(trip);
   }, [trip, error]);
 
   if (isLoading) {
@@ -36,7 +37,12 @@ export default function TripDetails({ onClick }: TripProps) {
     return <h1>{err?.message}</h1>;
   }
 
-  const { tripName, startDate, endDate } = trip;
+  const [{ tripName, startDate, endDate }] = trip;
+  const editTrip = {
+    ...trip[0],
+    startDate: new Date(trip[0].startDate),
+    endDate: new Date(trip[0].endDate),
+  };
 
   async function handleIconChange(icon: string) {
     setActiveIcon(icon);
@@ -68,13 +74,13 @@ export default function TripDetails({ onClick }: TripProps) {
     <div className="container roboto bg-white">
       <header className="flex justify-center content-center">
         <div
-          onClick={() => onClick(trip)}
+          onClick={() => onClick(editTrip)}
           className="text-center hover:underline cursor-pointer">
           <div className="h-full flex flex-wrap content-center">
             <h1 className="w-full text-xl mb-1 font-semibold tracking-wide">
               {tripName}
             </h1>
-            <p className="w-full text-sm text-gray-400">{`${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`}</p>
+            <p className="w-full text-sm text-gray-400">{`${editTrip.startDate.toLocaleDateString()} - ${editTrip.endDate.toLocaleDateString()}`}</p>
           </div>
         </div>
         <IconPopover iconUrl={activeIcon} onClick={handleIconChange} />

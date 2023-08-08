@@ -18,7 +18,7 @@ export type GPlace = {
 
 export default function PlaceSearch({ onChange, newPlace }: PlaceSearchProps) {
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: 'AIzaSyB2hMYygS2AnFwCoVEmMApfPdCQ8GKbOdY',
+    googleMapsApiKey: 'AIzaSyAhJZmkY0iTc_EmPFOoeaiXNrKN7exVKls',
     libraries: googleMapsLibraries,
   });
 

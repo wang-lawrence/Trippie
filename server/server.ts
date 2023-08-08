@@ -38,17 +38,50 @@ app.get('/api/user/:userId/trips', async (req, res) => {
   res.json(data);
 });
 
-app.get('/api/user/:userId/trip/:tripId', async (req, res) => {
-  const { userId, tripId } = req.params;
-  const sql = `
-        select *
-        from "trip"
-        where "userId" = $1 and "tripId" = $2;
-  `;
-  const params = [userId, tripId];
-  const result = await db.query(sql, params);
-  const data = result.rows;
-  res.json(data);
+// app.get('/api/user/:userId/trip/:tripId', async (req, res) => {
+//   const { userId, tripId } = req.params;
+//   const sql = `
+//         select *
+//         from "trip"
+//         where "userId" = $1 and "tripId" = $2;
+//   `;
+//   const params = [userId, tripId];
+//   const result = await db.query(sql, params);
+//   const data = result.rows;
+//   res.json(data);
+// });
+
+app.get('/api/user/:userId/trip/:tripId', async (req, res, next) => {
+  try {
+    const { userId, tripId } = req.params;
+    const sql = `
+          select  "t".*,
+                  "e"."eventId",
+                  "e"."eventName",
+                  "e"."eventDate",
+                  "e"."startTime",
+                  "e"."endTime",
+                  "e"."location",
+                  "e"."notes",
+                  "e"."placeId",
+                  "e"."lat",
+                  "e"."lng"
+          from "trip" as "t"
+          left join "event" as "e" using ("tripId")
+          where "userId" = $1 and "tripId" = $2
+          order by "startTime";
+    `;
+    const params = [userId, tripId];
+    const result = await db.query(sql, params);
+    const data = result.rows;
+    if (data) {
+      res.status(200).json(data);
+    } else {
+      throw new ClientError(404, `Cannot find trip`);
+    }
+  } catch (err) {
+    next(err);
+  }
 });
 
 app.post('/api/trip', async (req, res) => {
