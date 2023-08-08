@@ -8,9 +8,6 @@ import SavedTrips from './Pages/SavedTrips';
 import TripDetails from './Pages/TripDetails';
 import TripEditForm from './Pages/TripEditForm';
 import EventEntryForm from './Pages/EventEntryForm';
-import PlaceSearch from './components/PlaceSearch';
-// import Map from './components/Map';
-// import AutoComplete from './components/Autocomplete.jsx';
 import NotFound from './Pages/NotFound';
 import { placeholder, TripEntry } from './lib/data';
 
