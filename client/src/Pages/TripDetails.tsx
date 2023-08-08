@@ -12,6 +12,7 @@ import { FaMapLocationDot } from 'react-icons/fa6';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { TripEntry, icons, updateTrip, deleteTrip } from '../lib/data';
 import useFindTrip from '../hooks/useFindTrip';
+import { DateTime, Interval } from 'luxon';
 
 type TripProps = {
   onClick: (trip: TripEntry) => void;
@@ -38,6 +39,36 @@ export default function TripDetails({ onClick }: TripProps) {
   }
 
   const [{ tripName, startDate, endDate }] = trip;
+
+  const tripDays = [];
+  if (startDate && endDate) {
+    const startDateLuxon = DateTime.fromISO(new Date(startDate).toISOString());
+    const endDateLuxon = DateTime.fromISO(new Date(endDate).toISOString());
+    const daysCount =
+      Interval.fromDateTimes(startDateLuxon, endDateLuxon).length('days') + 1;
+    for (let i = 0; i < daysCount; i++) {
+      const dateI = startDateLuxon.plus({ days: i });
+      const eventsI = trip
+        .filter(
+          (event) =>
+            new Date(event.startTime).toLocaleDateString() ===
+            dateI.toLocaleString()
+        )
+        .map((event) => {
+          return <li key={event.eventId}>{event.eventName}</li>;
+        });
+      tripDays.push(
+        <ul key={i}>
+          {`Day ${i + 1} -  ${dateI.toLocaleString({
+            ...DateTime.DATE_SHORT,
+            weekday: 'long',
+          })}`}
+          {eventsI}
+        </ul>
+      );
+    }
+  }
+
   const editTrip = {
     ...trip[0],
     startDate: new Date(trip[0].startDate),
@@ -100,13 +131,7 @@ export default function TripDetails({ onClick }: TripProps) {
           </Button>
         </Modal>
       </section>
-      <section className="mt-3 ">
-        <header>Day 1 - 11/09/23</header>
-        <header>Day 2 - 11/10/23</header>
-        <header>Day 3 - 11/11/23</header>
-        <header>Day 4 - 11/12/23</header>
-        <header>Day 5 - 11/13/23</header>
-      </section>
+      <section className="mt-3 ">{tripDays}</section>
     </div>
   );
 }

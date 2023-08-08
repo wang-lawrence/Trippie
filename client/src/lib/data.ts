@@ -33,6 +33,7 @@ export type TripEntry = {
 export type EventEntry = {
   userId: number;
   tripId: number;
+  eventId: number;
   eventName: string;
   eventDate: Date;
   startTime: string;
@@ -49,6 +50,7 @@ export type TripEvents = TripEntry & EventEntry;
 export const placeholder: TripEvents = {
   tripId: 1,
   userId: 1,
+  eventId: 1,
   tripName: '',
   startDate: new Date(),
   endDate: new Date(),
@@ -137,7 +139,9 @@ export async function deleteTrip(
   return await res.json();
 }
 
-export async function addEvent(newEvent: EventEntry): Promise<EventEntry[]> {
+export async function addEvent(
+  newEvent: Partial<EventEntry>
+): Promise<EventEntry[]> {
   const reqConfig = {
     method: 'POST',
     headers: {
