@@ -30,6 +30,20 @@ export type TripEntry = {
   iconUrl: string;
 };
 
+export type EventEntry = {
+  userId: number;
+  tripId: number;
+  eventName: string;
+  eventDate: Date;
+  startTime: string;
+  endTime: string;
+  location: string;
+  notes: string;
+  placeId: string;
+  lat: number;
+  lng: number;
+};
+
 export const placeholder: TripEntry = {
   tripId: 1,
   userId: 1,
@@ -62,14 +76,14 @@ export async function fetchTrip(
 }
 
 export async function addTrip(
-  newEvent: Partial<TripEntry>
+  newTrip: Partial<TripEntry>
 ): Promise<TripEntry[]> {
   const reqConfig = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(newEvent),
+    body: JSON.stringify(newTrip),
   };
   const res = await fetch('/api/trip', reqConfig);
   if (!res.ok) {
@@ -106,6 +120,24 @@ export async function deleteTrip(
     method: 'DELETE',
   };
   const res = await fetch(`/api/user/${userId}/trip/${tripId}`, reqConfig);
+  if (!res.ok) {
+    throw new Error(`Error status ${res.status}`);
+  }
+  return await res.json();
+}
+
+export async function addEvent(newEvent: EventEntry): Promise<EventEntry[]> {
+  const reqConfig = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(newEvent),
+  };
+  const res = await fetch(
+    `/api/user/${newEvent.userId}/trip/${newEvent.tripId}`,
+    reqConfig
+  );
   if (!res.ok) {
     throw new Error(`Error status ${res.status}`);
   }

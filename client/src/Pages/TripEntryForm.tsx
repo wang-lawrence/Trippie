@@ -134,8 +134,7 @@ export default function TripEntryForm() {
                           </FormControl>
                         </PopoverTrigger>
                         <PopoverContent
-                          className="w-auto p-0 "
-                          // relative
+                          className="w-auto p-0 relative"
                           align="start">
                           <Calendar
                             mode="single"

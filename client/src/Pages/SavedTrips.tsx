@@ -22,7 +22,7 @@ export default function SavedTrips() {
   if (error) return <h1>{`Fetch error: ${error.message}`}</h1>;
 
   return (
-    <div className="container">
+    <div className="container bg-white">
       {trips.length ? (
         trips.map(({ tripId, tripName, startDate, endDate, iconUrl }) => (
           <TripCard

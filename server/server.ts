@@ -120,6 +120,41 @@ app.delete('/api/user/:userId/trip/:tripId', async (req, res, next) => {
   }
 });
 
+app.post(`/api/user/:userId/trip/:tripId`, async (req, res) => {
+  const {
+    tripId,
+    eventName,
+    eventDate,
+    startTime,
+    endTime,
+    location,
+    notes,
+    placeId,
+    lat,
+    lng,
+  } = req.body;
+  const sql = `
+        insert into "event" ("tripId", "eventName", "eventDate", "startTime", "endTime", "location", "notes", "placeId", "lat", "lng")
+        values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        returning *;
+  `;
+  const params = [
+    tripId,
+    eventName,
+    eventDate,
+    startTime,
+    endTime,
+    location,
+    notes,
+    placeId,
+    lat,
+    lng,
+  ];
+  const result = await db.query(sql, params);
+  const data = result.rows;
+  res.json(data);
+});
+
 /**
  * Serves React's index.html if no api route matches.
  *

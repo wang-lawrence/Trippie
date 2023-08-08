@@ -4,11 +4,13 @@
 
 body {
   margin: 0;
+  background-color: lightgray;
 }
 
 .container {
-  padding: 0 1rem;
+  padding: 1.5rem;
   max-width: 1200px;
+  height: 100vh;
 }
 
 .sansita {
