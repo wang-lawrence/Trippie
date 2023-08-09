@@ -124,10 +124,10 @@ export default function TripDetails({ onClick }: TripProps) {
 
   async function handleIconChange(icon: string) {
     setActiveIcon(icon);
-    if (trip) {
+    if (editTrip) {
       try {
         await updateTrip({
-          ...trip,
+          ...editTrip,
           userId: 1,
           tripId: Number(tripId),
           iconUrl: icon,
