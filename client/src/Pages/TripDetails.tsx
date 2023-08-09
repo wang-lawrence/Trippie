@@ -21,6 +21,7 @@ type TripProps = {
 export default function TripDetails({ onClick }: TripProps) {
   const [activeIcon, setActiveIcon] = useState('');
   const [err, setError] = useState<Error>();
+  const [activeEventId, setActiveEventId] = useState<number | undefined>(1);
   const { tripId } = useParams();
   const navigate = useNavigate();
   const { trip, error, isLoading } = useFindTrip(1, Number(tripId));
@@ -38,6 +39,15 @@ export default function TripDetails({ onClick }: TripProps) {
     return <h1>{err?.message}</h1>;
   }
 
+  function handleToggleEvent(selEventId: number) {
+    console.log(selEventId);
+    if (selEventId === activeEventId) {
+      setActiveEventId(undefined);
+    } else {
+      setActiveEventId(selEventId);
+    }
+  }
+
   const [{ tripName, startDate, endDate }] = trip;
 
   const tripDays = [];
@@ -48,23 +58,54 @@ export default function TripDetails({ onClick }: TripProps) {
       Interval.fromDateTimes(startDateLuxon, endDateLuxon).length('days') + 1;
     for (let i = 0; i < daysCount; i++) {
       const dateI = startDateLuxon.plus({ days: i });
-      const eventsI = trip
+      const eventCards = trip
         .filter(
-          (event) =>
-            new Date(event.startTime).toLocaleDateString() ===
-            dateI.toLocaleString()
+          ({ startTime }) =>
+            new Date(startTime).toLocaleDateString() === dateI.toLocaleString()
         )
-        .map((event) => {
-          return <li key={event.eventId}>{event.eventName}</li>;
-        });
+        .map(
+          (
+            { eventId, eventName, startTime, endTime, location, notes },
+            index
+          ) => {
+            let startTimeFormatted = '';
+            let endTimeFormatted = '';
+            startTimeFormatted = DateTime.fromISO(startTime).toFormat(
+              'h:mm a'
+            ) as string;
+            endTimeFormatted = DateTime.fromISO(endTime).toFormat(
+              'h:mm a'
+            ) as string;
+            return (
+              <li key={eventId}>
+                <div
+                  onClick={() => handleToggleEvent(eventId)}
+                  className="border p-2 mb-1 bg-[#F8F1F1] rounded-md border border-gray-200 shadow cursor-pointer hover:shadow-md hover:outline hover:outline-slate-200">
+                  <h3>{index + 1 + '. ' + eventName}</h3>
+                  <p className="text-xs">{`${startTimeFormatted} - ${endTimeFormatted}`}</p>
+                </div>
+                {activeEventId === eventId && (
+                  <div className="p-2 -mt-2 mb-2 rounded-b border-l-1 border-r-1 border-b-1 border-gray-200 shadow">
+                    <p className="text-xs">{notes}</p>
+                  </div>
+                )}
+              </li>
+            );
+          }
+        );
       tripDays.push(
-        <ul key={i}>
-          {`Day ${i + 1} -  ${dateI.toLocaleString({
-            ...DateTime.DATE_SHORT,
-            weekday: 'long',
-          })}`}
-          {eventsI}
-        </ul>
+        <>
+          {i !== 0 && <hr />}
+          <ul key={i}>
+            <span className="font-semibold">{`Day ${
+              i + 1
+            } -  ${dateI.toLocaleString({
+              ...DateTime.DATE_SHORT,
+              weekday: 'long',
+            })}`}</span>
+            {eventCards}
+          </ul>
+        </>
       );
     }
   }
@@ -131,7 +172,9 @@ export default function TripDetails({ onClick }: TripProps) {
           </Button>
         </Modal>
       </section>
-      <section className="mt-3 ">{tripDays}</section>
+      <section className="flex justify-center">
+        <div className="mt-3 max-w-screen-lg w-1/2">{tripDays}</div>
+      </section>
     </div>
   );
 }
