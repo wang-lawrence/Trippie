@@ -12,6 +12,7 @@ import { FaMapLocationDot } from 'react-icons/fa6';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { TripEntry, icons, updateTrip, deleteTrip } from '../lib/data';
 import useFindTrip from '../hooks/useFindTrip';
+import { DateTime, Interval } from 'luxon';
 
 type TripProps = {
   onClick: (trip: TripEntry) => void;
@@ -20,13 +21,15 @@ type TripProps = {
 export default function TripDetails({ onClick }: TripProps) {
   const [activeIcon, setActiveIcon] = useState('');
   const [err, setError] = useState<Error>();
+  const [activeEventId, setActiveEventId] = useState<number | undefined>(1);
   const { tripId } = useParams();
   const navigate = useNavigate();
   const { trip, error, isLoading } = useFindTrip(1, Number(tripId));
 
   useEffect(() => {
-    if (trip) setActiveIcon(trip.iconUrl);
+    if (trip) setActiveIcon(trip[0].iconUrl);
     if (error) setError(error);
+    console.log(trip);
   }, [trip, error]);
 
   if (isLoading) {
@@ -36,7 +39,88 @@ export default function TripDetails({ onClick }: TripProps) {
     return <h1>{err?.message}</h1>;
   }
 
-  const { tripName, startDate, endDate } = trip;
+  function handleToggleEvent(selEventId: number) {
+    console.log(selEventId);
+    if (selEventId === activeEventId) {
+      setActiveEventId(undefined);
+    } else {
+      setActiveEventId(selEventId);
+    }
+  }
+
+  const [{ tripName, startDate, endDate }] = trip;
+  // this is pretty gnarly, will work on making this its own component
+  const tripDays = [];
+  if (startDate && endDate) {
+    const startDateLuxon = DateTime.fromISO(new Date(startDate).toISOString());
+    const endDateLuxon = DateTime.fromISO(new Date(endDate).toISOString());
+    const daysCount =
+      Interval.fromDateTimes(startDateLuxon, endDateLuxon).length('days') + 1;
+    for (let i = 0; i < daysCount; i++) {
+      const dateI = startDateLuxon.plus({ days: i });
+      const eventCards = trip
+        .filter(
+          ({ startTime }) =>
+            new Date(startTime).toLocaleDateString() === dateI.toLocaleString()
+        )
+        .map(
+          (
+            { eventId, eventName, startTime, endTime, location, notes },
+            index
+          ) => {
+            let startTimeFormatted = '';
+            let endTimeFormatted = '';
+            startTimeFormatted = DateTime.fromISO(startTime).toFormat(
+              'h:mm a'
+            ) as string;
+            endTimeFormatted = DateTime.fromISO(endTime).toFormat(
+              'h:mm a'
+            ) as string;
+            return (
+              <li key={eventId}>
+                <div
+                  onClick={() => handleToggleEvent(eventId)}
+                  className="border p-2 mb-1 bg-[#F8F1F1] rounded-md border border-gray-200 shadow cursor-pointer hover:shadow-md hover:outline hover:outline-slate-200">
+                  <h3>{index + 1 + '. ' + eventName}</h3>
+                  <p className="text-xs">{`${startTimeFormatted} - ${endTimeFormatted}`}</p>
+                </div>
+                {activeEventId === eventId && (
+                  <div className="p-2 -mt-1 mb-2 rounded-b border-l-1 border-r-1 border-b-1 border-gray-200 shadow">
+                    <p className="text-xs">{notes}</p>
+                  </div>
+                )}
+              </li>
+            );
+          }
+        );
+      tripDays.push(
+        <>
+          {i !== 0 && <hr className="my-2" />}
+          <ul key={i}>
+            <span className="font-semibold">{`Day ${
+              i + 1
+            } -  ${dateI.toLocaleString({
+              ...DateTime.DATE_SHORT,
+              weekday: 'long',
+            })}`}</span>
+            {eventCards.length > 0 ? (
+              eventCards
+            ) : (
+              <li className="text-xs text-gray-400 mb-1">
+                No Scheduled Events
+              </li>
+            )}
+          </ul>
+        </>
+      );
+    }
+  }
+
+  const editTrip = {
+    ...trip[0],
+    startDate: new Date(trip[0].startDate),
+    endDate: new Date(trip[0].endDate),
+  };
 
   async function handleIconChange(icon: string) {
     setActiveIcon(icon);
@@ -68,13 +152,13 @@ export default function TripDetails({ onClick }: TripProps) {
     <div className="container roboto bg-white">
       <header className="flex justify-center content-center">
         <div
-          onClick={() => onClick(trip)}
+          onClick={() => onClick(editTrip)}
           className="text-center hover:underline cursor-pointer">
           <div className="h-full flex flex-wrap content-center">
             <h1 className="w-full text-xl mb-1 font-semibold tracking-wide">
               {tripName}
             </h1>
-            <p className="w-full text-sm text-gray-400">{`${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`}</p>
+            <p className="w-full text-sm text-gray-400">{`${editTrip.startDate.toLocaleDateString()} - ${editTrip.endDate.toLocaleDateString()}`}</p>
           </div>
         </div>
         <IconPopover iconUrl={activeIcon} onClick={handleIconChange} />
@@ -94,12 +178,8 @@ export default function TripDetails({ onClick }: TripProps) {
           </Button>
         </Modal>
       </section>
-      <section className="mt-3 ">
-        <header>Day 1 - 11/09/23</header>
-        <header>Day 2 - 11/10/23</header>
-        <header>Day 3 - 11/11/23</header>
-        <header>Day 4 - 11/12/23</header>
-        <header>Day 5 - 11/13/23</header>
+      <section className="flex justify-center">
+        <div className="mt-3 max-w-screen-lg w-1/2">{tripDays}</div>
       </section>
     </div>
   );

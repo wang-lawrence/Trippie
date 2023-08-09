@@ -24,7 +24,7 @@ import {
 } from '../components/ui/popover';
 // import { toast } from "@/src/components/ui/use-toast"
 import { useState } from 'react';
-import { updateTrip, TripEntry } from '../lib/data';
+import { updateTrip, TripEntry, TripEvents } from '../lib/data';
 import { Link, useNavigate } from 'react-router-dom';
 
 const FormSchema = z.object({
@@ -42,7 +42,7 @@ const FormSchema = z.object({
 type TripFormValues = z.infer<typeof FormSchema>;
 
 type Props = {
-  editTrip: TripEntry;
+  editTrip: Partial<TripEvents>;
 };
 
 export default function TripEditForm({ editTrip }: Props) {

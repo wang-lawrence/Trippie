@@ -33,6 +33,7 @@ export type TripEntry = {
 export type EventEntry = {
   userId: number;
   tripId: number;
+  eventId: number;
   eventName: string;
   eventDate: Date;
   startTime: string;
@@ -44,13 +45,25 @@ export type EventEntry = {
   lng: number;
 };
 
-export const placeholder: TripEntry = {
+export type TripEvents = TripEntry & EventEntry;
+
+export const placeholder: TripEvents = {
   tripId: 1,
   userId: 1,
+  eventId: 1,
   tripName: '',
   startDate: new Date(),
   endDate: new Date(),
   iconUrl: 'placeholder-image',
+  eventName: '',
+  eventDate: new Date(),
+  startTime: '',
+  endTime: '',
+  location: '',
+  notes: '',
+  placeId: '',
+  lat: 0,
+  lng: 0,
 };
 
 export async function fetchAllTrips(userId: number): Promise<TripEntry[]> {
@@ -64,14 +77,14 @@ export async function fetchAllTrips(userId: number): Promise<TripEntry[]> {
 export async function fetchTrip(
   userId: number,
   tripId: number
-): Promise<TripEntry[]> {
+): Promise<TripEvents[]> {
   const res = await fetch(`/api/user/${userId}/trip/${tripId}`);
   if (!res.ok) {
     throw new Error(`Error status ${res.status}`);
   }
   const trip = await res.json();
-  trip[0].startDate = new Date(trip[0].startDate);
-  trip[0].endDate = new Date(trip[0].endDate);
+  // trip[0].startDate = new Date(trip[0].startDate);
+  // trip[0].endDate = new Date(trip[0].endDate);
   return trip;
 }
 
@@ -126,7 +139,9 @@ export async function deleteTrip(
   return await res.json();
 }
 
-export async function addEvent(newEvent: EventEntry): Promise<EventEntry[]> {
+export async function addEvent(
+  newEvent: Partial<EventEntry>
+): Promise<EventEntry[]> {
   const reqConfig = {
     method: 'POST',
     headers: {

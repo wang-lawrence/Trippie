@@ -9,10 +9,10 @@ import TripDetails from './Pages/TripDetails';
 import TripEditForm from './Pages/TripEditForm';
 import EventEntryForm from './Pages/EventEntryForm';
 import NotFound from './Pages/NotFound';
-import { placeholder, TripEntry } from './lib/data';
+import { placeholder, TripEntry, TripEvents } from './lib/data';
 
 function App() {
-  const [editTrip, setEditTrip] = useState(placeholder);
+  const [editTrip, setEditTrip] = useState<Partial<TripEvents>>(placeholder);
   const navigate = useNavigate();
 
   function handleEditTripSubmit(trip: TripEntry) {
