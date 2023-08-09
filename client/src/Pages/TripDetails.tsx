@@ -49,7 +49,7 @@ export default function TripDetails({ onClick }: TripProps) {
   }
 
   const [{ tripName, startDate, endDate }] = trip;
-
+  // this is pretty gnarly, will work on making this its own component
   const tripDays = [];
   if (startDate && endDate) {
     const startDateLuxon = DateTime.fromISO(new Date(startDate).toISOString());
@@ -85,7 +85,7 @@ export default function TripDetails({ onClick }: TripProps) {
                   <p className="text-xs">{`${startTimeFormatted} - ${endTimeFormatted}`}</p>
                 </div>
                 {activeEventId === eventId && (
-                  <div className="p-2 -mt-2 mb-2 rounded-b border-l-1 border-r-1 border-b-1 border-gray-200 shadow">
+                  <div className="p-2 -mt-1 mb-2 rounded-b border-l-1 border-r-1 border-b-1 border-gray-200 shadow">
                     <p className="text-xs">{notes}</p>
                   </div>
                 )}
@@ -95,7 +95,7 @@ export default function TripDetails({ onClick }: TripProps) {
         );
       tripDays.push(
         <>
-          {i !== 0 && <hr />}
+          {i !== 0 && <hr className="my-2" />}
           <ul key={i}>
             <span className="font-semibold">{`Day ${
               i + 1
@@ -103,7 +103,13 @@ export default function TripDetails({ onClick }: TripProps) {
               ...DateTime.DATE_SHORT,
               weekday: 'long',
             })}`}</span>
-            {eventCards}
+            {eventCards.length > 0 ? (
+              eventCards
+            ) : (
+              <li className="text-xs text-gray-400 mb-1">
+                No Scheduled Events
+              </li>
+            )}
           </ul>
         </>
       );
