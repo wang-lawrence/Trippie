@@ -127,6 +127,14 @@ app.put('/api/user/:userId/trip/:tripId', async (req, res, next) => {
   }
 });
 
+// `
+//           with "deleted_events" as (
+//             delete from "event"
+//             where "userId" = $1 and "tripId" = $2
+//             returning "tripId")
+//                delete from "trip"
+//                where "tripId" in (select "tripId" from "deleted_events");`
+
 app.delete('/api/user/:userId/trip/:tripId', async (req, res, next) => {
   try {
     const userId = Number(req.params.userId);
@@ -134,14 +142,22 @@ app.delete('/api/user/:userId/trip/:tripId', async (req, res, next) => {
     if (!Number.isInteger(userId) || !Number.isInteger(tripId)) {
       throw new ClientError(400, 'Missing user or trip parameters');
     }
-    const sql = `
+    const sql1 = `
+            delete
+              from "event"
+              where "tripId" = $1
+              returning *;
+          `;
+    const sql2 = `
             delete
               from "trip"
               where "userId" = $1 and "tripId" = $2
               returning *;
           `;
-    const params = [userId, tripId];
-    const result = await db.query(sql, params);
+    const params1 = [tripId];
+    const params2 = [userId, tripId];
+    await db.query(sql1, params1);
+    const result = await db.query(sql2, params2);
     const trip = result.rows[0];
     if (trip) {
       res.sendStatus(204);
