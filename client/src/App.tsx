@@ -8,7 +8,6 @@ import SavedTrips from './Pages/SavedTrips';
 import TripDetails from './Pages/TripDetails';
 import TripEditForm from './Pages/TripEditForm';
 import EventEntryForm from './Pages/EventEntryForm';
-import TripMap from './components/TripMap';
 import NotFound from './Pages/NotFound';
 import { placeholder, TripEntry, TripEvents } from './lib/data';
 
@@ -24,7 +23,7 @@ function App() {
     <div>
       <Routes>
         <Route path="/" element={<NavBar />}>
-          <Route index element={<TripMap />} />
+          <Route index />
           <Route path="trip-form" element={<TripEntryForm />} />
           <Route
             path="trip-form/:tripId"

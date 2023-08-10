@@ -15,7 +15,8 @@ body {
 
 .map-container {
   width: 100%;
-  height: 80vh;
+  height: 95%;
+  border-radius: 5px;
 }
 
 .sansita {
@@ -46,4 +47,8 @@ body {
 
 .bg-green {
   background-color: #025464;
+}
+
+.pin {
+  transform: rotate(45deg);
 }

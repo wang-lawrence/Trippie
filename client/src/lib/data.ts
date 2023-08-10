@@ -21,6 +21,20 @@ export const icons = [
   '/images/travel-vector-free-icon-set-40.png',
 ];
 
+type Colors = {
+  [key: string]: string;
+};
+
+export const pinColors: Colors = {
+  color0: 'FF0000', // red
+  color1: '00FFFF', // cyan
+  color2: 'FFFF00', // yellow
+  color3: 'FFFFFF', // white
+  color4: 'F0F8FF', // AliceBlue
+  color5: 'FF7F50', // Coral
+  color6: 'FF69B4', // HotPink
+};
+
 export type TripEntry = {
   tripId: number;
   userId: number;
