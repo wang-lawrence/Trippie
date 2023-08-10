@@ -58,6 +58,7 @@ export default function TripDetails({ onClick }: TripProps) {
       setActiveEventId(selEventId);
     }
   }
+  console.log(trip);
 
   function showMapDay(i: number) {
     const selDays = new Set();
@@ -100,6 +101,7 @@ export default function TripDetails({ onClick }: TripProps) {
             endTimeFormatted = DateTime.fromISO(endTime).toFormat(
               'h:mm a'
             ) as string;
+
             return (
               <li key={eventId}>
                 <div

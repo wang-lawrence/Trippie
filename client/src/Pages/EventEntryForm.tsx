@@ -40,8 +40,6 @@ export default function EventEntryForm() {
   const [error, setError] = useState<Error>();
   const navigate = useNavigate();
 
-  console.log('rendered');
-
   const dateOptions = [];
 
   if (startDate && endDate) {
@@ -77,13 +75,16 @@ export default function EventEntryForm() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
+    const timeZoneHourOffset =
+      DateTime.now().toUTC().hour - DateTime.now().hour;
+
     const startTimeHrMin = {
-      hour: DateTime.fromISO(startTime).hour,
+      hour: DateTime.fromISO(startTime).hour + timeZoneHourOffset,
       minute: DateTime.fromISO(startTime).minute,
     };
 
     const endTimeHrMin = {
-      hour: DateTime.fromISO(endTime).hour,
+      hour: DateTime.fromISO(endTime).hour + timeZoneHourOffset,
       minute: DateTime.fromISO(endTime).minute,
     };
 
@@ -108,7 +109,6 @@ export default function EventEntryForm() {
 
     try {
       await addEvent(newEventEntry);
-      console.log('newEventEntry submitted:', newEventEntry);
     } catch (error) {
       setError(error as Error);
     } finally {
