@@ -4,6 +4,7 @@ type DaysTabProps = {
   showMapDay: (i: number) => void;
 };
 
+// creates a series of buttons that'll toggle the map markers by day
 export default function DaysTab({
   activeMapDays,
   daysCount,

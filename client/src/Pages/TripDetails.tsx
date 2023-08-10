@@ -42,7 +42,6 @@ export default function TripDetails({ onClick }: TripProps) {
   useEffect(() => {
     if (trip) setActiveIcon(trip[0].iconUrl);
     if (error) setError(error);
-    console.log(trip);
   }, [trip, error]);
 
   if (isLoading) {
@@ -74,7 +73,6 @@ export default function TripDetails({ onClick }: TripProps) {
   const [{ tripName, startDate, endDate }] = trip;
   // this is pretty gnarly, will work on making this its own component
   let daysCount = 1;
-  let mapEvents: TripEvents[] | null = [];
 
   const tripDays = [];
   if (startDate && endDate) {
