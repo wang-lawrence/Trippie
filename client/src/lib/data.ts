@@ -26,13 +26,13 @@ type Colors = {
 };
 
 export const pinColors: Colors = {
-  color0: 'FF0000', // red
-  color1: '00FFFF', // cyan
-  color2: 'FFFF00', // yellow
-  color3: 'FFFFFF', // white
-  color4: 'F0F8FF', // AliceBlue
-  color5: 'FF7F50', // Coral
-  color6: 'FF69B4', // HotPink
+  0: 'FF0000', // red
+  1: '00FFFF', // cyan
+  2: 'FFFF00', // yellow
+  3: 'FFFFFF', // white
+  4: 'F0F8FF', // AliceBlue
+  5: 'FF7F50', // Coral
+  6: 'FF69B4', // HotPink
 };
 
 export type TripEntry = {

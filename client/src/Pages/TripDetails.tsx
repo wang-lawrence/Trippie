@@ -18,6 +18,7 @@ import {
   updateTrip,
   deleteTrip,
   TripEvents,
+  pinColors,
 } from '../lib/data';
 import useFindTrip from '../hooks/useFindTrip';
 import { DateTime, Interval } from 'luxon';
@@ -33,6 +34,7 @@ export default function TripDetails({ onClick }: TripProps) {
     undefined
   );
   const [activeMapDays, setactiveMapDays] = useState<number[]>([0]);
+  const [showMap, setShowMap] = useState(false);
   const { tripId } = useParams();
   const navigate = useNavigate();
   const { trip, error, isLoading } = useFindTrip(1, Number(tripId));
@@ -104,13 +106,17 @@ export default function TripDetails({ onClick }: TripProps) {
               <li key={eventId}>
                 <div
                   onClick={() => handleToggleEvent(eventId)}
-                  className="border flex pl-3 py-1 mb-1 bg-[#F8F1F1] rounded-md border border-gray-200 shadow cursor-pointer hover:shadow-md hover:outline hover:outline-slate-200">
+                  className="border flex pl-3 py-1 mb-1 bg-gray-100 rounded-md border border-gray-200 shadow cursor-pointer hover:shadow-md hover:outline hover:outline-slate-200">
                   <div className="flex items-center">
-                    <div className="pin w-3 h-3 bg-blue">{index + 1}</div>
+                    <div
+                      className={`rounded-full w-6 h-6 border border-gray-300 bg-opacity-50`}
+                      style={{ background: `#${pinColors[i]}` }}>
+                      <p className="text-center">{index + 1}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h5 className="text-sm">{index + 1 + '. ' + eventName}</h5>
-                    <p className="text-[0.65rem] text-gray-500 ml-4">{`${startTimeFormatted} - ${endTimeFormatted}`}</p>
+                  <div className="ml-4">
+                    <h5 className="text-sm">{eventName}</h5>
+                    <p className="text-[0.65rem] text-gray-500">{`${startTimeFormatted} - ${endTimeFormatted}`}</p>
                   </div>
                 </div>
                 {activeEventId === eventId && (
@@ -199,7 +205,9 @@ export default function TripDetails({ onClick }: TripProps) {
             Add Event <AiOutlinePlusCircle className="ml-2" />
           </Button>
         </Link>
-        <Button className="bg-gold w-1/3 max-w-[120px] mx-7">
+        <Button
+          onClick={() => setShowMap(!showMap)}
+          className="bg-gold w-1/3 max-w-[120px] mx-7">
           Map <FaMapLocationDot className="ml-2" />
         </Button>
         <Modal onContClick={handleDeleteTrip} deleteName={tripName}>
@@ -208,22 +216,30 @@ export default function TripDetails({ onClick }: TripProps) {
           </Button>
         </Modal>
       </section>
-      <div className="flex justify-center h-[75vh]">
-        <section className="mt-3 px-2 max-w-screen-lg w-1/2 overflow-scroll">
+      <div className="flex flex-wrap justify-center h-[80vh]">
+        <section
+          className={`mt-3 px-2 max-w-screen-md overflow-scroll ${
+            showMap ? 'h-1/3 w-full sm:h-full sm:w-1/2' : 'w-full sm:w-3/4'
+          }`}>
           <div>{tripDays}</div>
         </section>
-        <section className="mt-3 max-w-screen-lg w-1/2">
-          <DaysTab
-            activeMapDays={activeMapDays}
-            daysCount={daysCount}
-            showMapDay={showMapDay}
-          />
-          <Map
-            trip={trip}
-            activeMapDays={activeMapDays}
-            startDate={startDate}
-          />
-        </section>
+        {showMap && (
+          <section
+            className={`mt-3 max-w-screen-lg  flex justify-center flex-wrap w-full sm:w-1/2 ${
+              showMap && 'h-2/3 sm:h-full'
+            }`}>
+            <DaysTab
+              activeMapDays={activeMapDays}
+              daysCount={daysCount}
+              showMapDay={showMapDay}
+            />
+            <Map
+              trip={trip}
+              activeMapDays={activeMapDays}
+              startDate={startDate}
+            />
+          </section>
+        )}
       </div>
     </div>
   );
