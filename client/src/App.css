@@ -10,7 +10,13 @@ body {
 .container {
   padding: 1.5rem;
   max-width: 1200px;
-  height: 100vh;
+  min-height: 100vh;
+}
+
+.map-container {
+  width: 95%;
+  height: 90%;
+  border-radius: 5px;
 }
 
 .sansita {
@@ -41,4 +47,8 @@ body {
 
 .bg-green {
   background-color: #025464;
+}
+
+.overflow-scroll::-webkit-scrollbar {
+  display: none;
 }
