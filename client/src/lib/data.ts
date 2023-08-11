@@ -207,3 +207,21 @@ export async function updateEvent(
   }
   return await res.json();
 }
+
+export async function deleteEvent(
+  userId: number,
+  tripId: number,
+  eventId: number
+): Promise<TripEntry[]> {
+  const reqConfig = {
+    method: 'DELETE',
+  };
+  const res = await fetch(
+    `/api/user/${userId}/trip/${tripId}/event/${eventId}`,
+    reqConfig
+  );
+  if (!res.ok) {
+    throw new Error(`Error status ${res.status}`);
+  }
+  return await res.json();
+}

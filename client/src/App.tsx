@@ -23,7 +23,8 @@ function App() {
     <div>
       <Routes>
         <Route path="/" element={<NavBar />}>
-          <Route index />
+          {/*replace with a home page once that's desgined*/}
+          <Route index element={<TripEntryForm />} />
           <Route path="trip-form" element={<TripEntryForm />} />
           <Route
             path="trip-form/:tripId"

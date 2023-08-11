@@ -15,9 +15,9 @@ export default function NavBar() {
             <Link to="/saved-trips" className="roboto pl-5 text-md font-light">
               Saved Trips
             </Link>
-            <a href="" className="roboto pl-5 text-md font-light">
+            {/* <a href="" className="roboto pl-5 text-md font-light">
               Log In
-            </a>
+            </a> */}
           </nav>
         </div>
       </div>
