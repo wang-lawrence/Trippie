@@ -22,7 +22,6 @@ export default function useFindTrip(
           throw new Error('Trip not found');
         }
         setTrip(activeTrip);
-        console.log(activeTrip);
       } catch (err) {
         setError(err as Error);
       }

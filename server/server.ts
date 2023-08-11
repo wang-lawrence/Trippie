@@ -127,14 +127,6 @@ app.put('/api/user/:userId/trip/:tripId', async (req, res, next) => {
   }
 });
 
-// `
-//           with "deleted_events" as (
-//             delete from "event"
-//             where "userId" = $1 and "tripId" = $2
-//             returning "tripId")
-//                delete from "trip"
-//                where "tripId" in (select "tripId" from "deleted_events");`
-
 app.delete('/api/user/:userId/trip/:tripId', async (req, res, next) => {
   try {
     const userId = Number(req.params.userId);
@@ -169,40 +161,138 @@ app.delete('/api/user/:userId/trip/:tripId', async (req, res, next) => {
   }
 });
 
-app.post(`/api/user/:userId/trip/:tripId`, async (req, res) => {
-  const {
-    tripId,
-    eventName,
-    eventDate,
-    startTime,
-    endTime,
-    location,
-    notes,
-    placeId,
-    lat,
-    lng,
-  } = req.body;
-  const sql = `
-        insert into "event" ("tripId", "eventName", "eventDate", "startTime", "endTime", "location", "notes", "placeId", "lat", "lng")
-        values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-        returning *;
-  `;
-  const params = [
-    tripId,
-    eventName,
-    eventDate,
-    startTime,
-    endTime,
-    location,
-    notes,
-    placeId,
-    lat,
-    lng,
-  ];
-  const result = await db.query(sql, params);
-  const data = result.rows;
-  res.json(data);
+app.post(`/api/user/:userId/trip/:tripId`, async (req, res, next) => {
+  try {
+    const {
+      tripId,
+      eventName,
+      eventDate,
+      startTime,
+      endTime,
+      location,
+      notes,
+      placeId,
+      lat,
+      lng,
+      gPlace,
+    } = req.body;
+    const sql = `
+          insert into "event" ("tripId", "eventName", "eventDate", "startTime", "endTime", "location", "notes", "placeId", "lat", "lng", "gPlace")
+          values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+          returning *;
+    `;
+    const params = [
+      tripId,
+      eventName,
+      eventDate,
+      startTime,
+      endTime,
+      location,
+      notes,
+      placeId,
+      lat,
+      lng,
+      gPlace,
+    ];
+    const result = await db.query(sql, params);
+    const data = result.rows;
+    res.json(data);
+  } catch (err) {
+    next(err);
+  }
 });
+
+app.get(
+  `/api/user/:userId/trip/:tripId/event/:eventId`,
+  async (req, res, next) => {
+    try {
+      const { userId, tripId, eventId } = req.params;
+      const sql = `
+          select  "t".*,
+                  "e"."eventId",
+                  "e"."eventName",
+                  "e"."eventDate",
+                  "e"."startTime",
+                  "e"."endTime",
+                  "e"."location",
+                  "e"."notes",
+                  "e"."placeId",
+                  "e"."lat",
+                  "e"."lng",
+                  "e"."gPlace"
+          from "trip" as "t"
+          left join "event" as "e" using ("tripId")
+          where "userId" = $1 and "tripId" = $2 and "eventId" = $3;
+    `;
+      const params = [userId, tripId, eventId];
+      const result = await db.query(sql, params);
+      const data = result.rows;
+      if (data) {
+        res.status(200).json(data);
+      } else {
+        throw new ClientError(404, `Cannot find trip`);
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+app.put(
+  `/api/user/:userId/trip/:tripId/event/:eventId`,
+  async (req, res, next) => {
+    try {
+      const {
+        tripId,
+        eventId,
+        eventName,
+        eventDate,
+        startTime,
+        endTime,
+        location,
+        notes,
+        placeId,
+        lat,
+        lng,
+        gPlace,
+      } = req.body;
+      const sql = `
+          update "event"
+             set "eventName" = $1,
+                 "eventDate" = $2,
+                 "startTime" = $3,
+                 "endTime" = $4,
+                 "location" = $5,
+                 "notes" = $6,
+                 "placeId" = $7,
+                 "lat" = $8,
+                 "lng" = $9,
+                 "gPlace" = $10
+          where "tripId" = $11 and "eventId" = $12
+          returning *;
+    `;
+      const params = [
+        eventName,
+        eventDate,
+        startTime,
+        endTime,
+        location,
+        notes,
+        placeId,
+        lat,
+        lng,
+        gPlace,
+        tripId,
+        eventId,
+      ];
+      const result = await db.query(sql, params);
+      const data = result.rows;
+      res.json(data);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 
 /**
  * Serves React's index.html if no api route matches.

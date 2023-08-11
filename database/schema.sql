@@ -16,8 +16,9 @@ CREATE TABLE "public"."event" (
 	"location" TEXT NOT NULL,
 	"notes" TEXT NOT NULL,
 	"placeId" TEXT NOT NULL,
-	"lat" DECIMAL NOT NULL,
-	"lng" DECIMAL NOT NULL,
+	"lat" DOUBLE PRECISION NOT NULL,
+	"lng" DOUBLE PRECISION NOT NULL,
+  "gPlace" TEXT,
 	CONSTRAINT "event_pk" PRIMARY KEY ("eventId")
 ) WITH (
   OIDS=FALSE

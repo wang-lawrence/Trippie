@@ -26,14 +26,12 @@ export default function Map({ trip, activeMapDays, startDate }: MapProps) {
     );
     // make the markers and get lat lng to calc center for map
     const dayMarkers = dayEvents.map(({ eventId, lat, lng }, index) => {
-      const latNumeric = Number(lat);
-      const lngNumeric = Number(lng);
-      latPlaces.push(latNumeric);
-      lngPlaces.push(lngNumeric);
+      latPlaces.push(lat);
+      lngPlaces.push(lng);
       return (
         <MarkerF
           key={eventId}
-          position={{ lat: latNumeric, lng: lngNumeric }}
+          position={{ lat, lng }}
           icon={{
             url: `https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=${
               index + 1
@@ -43,7 +41,6 @@ export default function Map({ trip, activeMapDays, startDate }: MapProps) {
       );
     });
     markers = [...markers, ...dayMarkers];
-    console.log('daymarkers:', dayMarkers, 'markers: ', markers);
   }
 
   const latCenter = (Math.max(...latPlaces) + Math.min(...latPlaces)) / 2;
