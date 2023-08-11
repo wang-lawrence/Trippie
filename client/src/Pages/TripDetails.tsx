@@ -17,7 +17,7 @@ import {
   icons,
   updateTrip,
   deleteTrip,
-  TripEvents,
+  deleteEvent,
   pinColors,
 } from '../lib/data';
 import useFindTrip from '../hooks/useFindTrip';
@@ -35,9 +35,10 @@ export default function TripDetails({ onClick }: TripProps) {
   );
   const [activeMapDays, setactiveMapDays] = useState<number[]>([0]);
   const [showMap, setShowMap] = useState(false);
+  const [deletedId, setDeletedId] = useState(0);
   const { tripId } = useParams();
   const navigate = useNavigate();
-  const { trip, error, isLoading } = useFindTrip(1, Number(tripId));
+  const { trip, error, isLoading } = useFindTrip(1, Number(tripId), deletedId);
 
   useEffect(() => {
     if (trip) setActiveIcon(trip[0].iconUrl);
@@ -124,7 +125,10 @@ export default function TripDetails({ onClick }: TripProps) {
                     </Link>
                   </div>
                   <div className="flex items-center w-8">
-                    <FaRegTrashCan className="hover:text-xl" />
+                    <FaRegTrashCan
+                      onClick={() => handleDeleteEvent(eventId)}
+                      className="hover:text-xl"
+                    />
                   </div>
                 </div>
                 {activeEventId === eventId && (
@@ -192,6 +196,16 @@ export default function TripDetails({ onClick }: TripProps) {
     }
   }
 
+  async function handleDeleteEvent(eventId: number) {
+    try {
+      await deleteEvent(1, Number(tripId), eventId);
+    } catch (error) {
+      setError(error as Error);
+    } finally {
+      setDeletedId(eventId);
+    }
+  }
+
   return (
     <div className="container roboto bg-white">
       <header className="flex justify-center content-center">
@@ -227,7 +241,9 @@ export default function TripDetails({ onClick }: TripProps) {
       <div className="flex flex-wrap justify-center h-[80vh]">
         <section
           className={`mt-3 px-2 max-w-screen-md overflow-scroll ${
-            showMap ? 'h-1/3 w-full sm:h-full sm:w-1/2' : 'w-full sm:w-3/4'
+            showMap
+              ? 'h-1/3 w-full sm:h-full sm:w-1/2'
+              : ' h-full w-full sm:w-3/4'
           }`}>
           <div>{tripDays}</div>
         </section>

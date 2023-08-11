@@ -9,7 +9,8 @@ type FindTripState = {
 
 export default function useFindTrip(
   userId: number,
-  tripId: number
+  tripId: number,
+  deletedId: number
 ): FindTripState {
   const [trip, setTrip] = useState<TripEvents[]>([placeholder]);
   const [error, setError] = useState<Error | undefined>();
@@ -25,9 +26,10 @@ export default function useFindTrip(
       } catch (err) {
         setError(err as Error);
       }
+      console.log('use toast here to display deleted event later', deletedId);
     }
     readTrips();
-  }, [userId, tripId]);
+  }, [userId, tripId, deletedId]);
 
   return { trip, error, isLoading: !trip && !error };
 }

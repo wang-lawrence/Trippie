@@ -294,6 +294,28 @@ app.put(
   }
 );
 
+app.delete(
+  `/api/user/:userId/trip/:tripId/event/:eventId`,
+  async (req, res, next) => {
+    try {
+      const tripId = Number(req.params.tripId);
+      const eventId = Number(req.params.eventId);
+      const sql = `
+          delete
+              from "event"
+              where "tripId" = $1 and "eventId" = $2
+              returning *;
+          `;
+      const params = [tripId, eventId];
+      const result = await db.query(sql, params);
+      const data = result.rows;
+      res.json(data);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
 /**
  * Serves React's index.html if no api route matches.
  *
