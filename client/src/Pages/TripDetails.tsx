@@ -10,7 +10,7 @@ import { Modal } from '../components/Modal';
 import Map from '../components/Map';
 import DaysTab from '../components/DaysTab';
 import { AiOutlinePlusCircle, AiOutlineMinusCircle } from 'react-icons/ai';
-import { FaMapLocationDot } from 'react-icons/fa6';
+import { FaMapLocationDot, FaPencil, FaRegTrashCan } from 'react-icons/fa6';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   TripEntry,
@@ -100,11 +100,10 @@ export default function TripDetails({ onClick }: TripProps) {
             endTimeFormatted = DateTime.fromISO(endTime).toFormat(
               'h:mm a'
             ) as string;
+
             return (
               <li key={eventId}>
-                <div
-                  onClick={() => handleToggleEvent(eventId)}
-                  className="border flex pl-3 py-1 mb-1 bg-gray-100 rounded-md border border-gray-200 shadow cursor-pointer hover:shadow-md hover:outline hover:outline-slate-200">
+                <div className="border flex pl-3 py-1 mb-1 bg-gray-100 rounded-md border border-gray-200 shadow cursor-pointer hover:shadow-md hover:outline hover:outline-slate-200">
                   <div className="flex items-center">
                     <div
                       className={`rounded-full w-6 h-6 border border-gray-300 bg-opacity-50`}
@@ -112,9 +111,20 @@ export default function TripDetails({ onClick }: TripProps) {
                       <p className="text-center">{index + 1}</p>
                     </div>
                   </div>
-                  <div className="ml-4">
+                  <div
+                    onClick={() => handleToggleEvent(eventId)}
+                    className="ml-4 basis-10/12">
                     <h5 className="text-sm">{eventName}</h5>
                     <p className="text-[0.65rem] text-gray-500">{`${startTimeFormatted} - ${endTimeFormatted}`}</p>
+                  </div>
+                  <div className="flex items-center w-8">
+                    <Link
+                      to={`event-form/start/${startDate}/end/${endDate}/${eventId}`}>
+                      <FaPencil className="hover:text-xl" />
+                    </Link>
+                  </div>
+                  <div className="flex items-center w-8">
+                    <FaRegTrashCan className="hover:text-xl" />
                   </div>
                 </div>
                 {activeEventId === eventId && (
@@ -198,7 +208,7 @@ export default function TripDetails({ onClick }: TripProps) {
         <IconPopover iconUrl={activeIcon} onClick={handleIconChange} />
       </header>
       <section className="flex justify-center mt-3">
-        <Link to={`event-form/${tripId}/start/${startDate}/end/${endDate}`}>
+        <Link to={`event-form/start/${startDate}/end/${endDate}/0`}>
           <Button className="bg-green w-1/3 max-w-[150px] min-w-[120px]">
             Add Event <AiOutlinePlusCircle className="ml-2" />
           </Button>

@@ -57,6 +57,7 @@ export type EventEntry = {
   placeId: string;
   lat: number;
   lng: number;
+  gPlace: string;
 };
 
 export type TripEvents = TripEntry & EventEntry;
@@ -78,6 +79,7 @@ export const placeholder: TripEvents = {
   placeId: '',
   lat: 0,
   lng: 0,
+  gPlace: '',
 };
 
 export async function fetchAllTrips(userId: number): Promise<TripEntry[]> {
@@ -97,8 +99,6 @@ export async function fetchTrip(
     throw new Error(`Error status ${res.status}`);
   }
   const trip = await res.json();
-  // trip[0].startDate = new Date(trip[0].startDate);
-  // trip[0].endDate = new Date(trip[0].endDate);
   return trip;
 }
 
@@ -165,6 +165,41 @@ export async function addEvent(
   };
   const res = await fetch(
     `/api/user/${newEvent.userId}/trip/${newEvent.tripId}`,
+    reqConfig
+  );
+  if (!res.ok) {
+    throw new Error(`Error status ${res.status}`);
+  }
+  return await res.json();
+}
+
+export async function fetchEvent(
+  userId: number,
+  tripId: number,
+  eventId: number
+): Promise<TripEvents[]> {
+  const res = await fetch(
+    `/api/user/${userId}/trip/${tripId}/event/${eventId}`
+  );
+  if (!res.ok) {
+    throw new Error(`Error status ${res.status}`);
+  }
+  const event = await res.json();
+  return event;
+}
+
+export async function updateEvent(
+  editEvent: Partial<EventEntry>
+): Promise<EventEntry[]> {
+  const reqConfig = {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(editEvent),
+  };
+  const res = await fetch(
+    `/api/user/${editEvent.userId}/trip/${editEvent.tripId}/event/${editEvent.eventId}`,
     reqConfig
   );
   if (!res.ok) {

@@ -35,7 +35,7 @@ function App() {
             element={<TripDetails onClick={handleEditTripSubmit} />}
           />
           <Route
-            path="trip-details/:tripId/event-form/:tripId/start/:startDate/end/:endDate"
+            path="trip-details/:tripId/event-form/start/:startDate/end/:endDate/:eventId"
             element={<EventEntryForm />}
           />
           <Route path="*" element={<NotFound />} />

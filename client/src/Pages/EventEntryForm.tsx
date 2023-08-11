@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useState, useEffect } from 'react';
 import { Label } from '../components/ui/label';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
@@ -14,12 +14,12 @@ import PlaceSearch from '../components/PlaceSearch';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { GPlace } from '../components/PlaceSearch';
 import { DateTime, Interval } from 'luxon';
-import { addEvent } from '../lib/data';
+import { addEvent, fetchEvent, updateEvent } from '../lib/data';
 
 type PlaceFields = {
   name: string;
   geometry: {
-    location: { lat: () => number; lng: () => number };
+    location: { lat: () => number | number; lng: () => number | number };
     viewport: object;
   };
   website: string;
@@ -30,19 +30,45 @@ type PlaceFields = {
 };
 
 export default function EventEntryForm() {
-  let { tripId, startDate, endDate } = useParams();
+  let { tripId, eventId, startDate, endDate } = useParams();
   const [eventName, setEventName] = useState('');
   const [eventDate, setEventDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [searchResult, setSearchResult] = useState<GPlace>();
   const [notes, setNotes] = useState('');
+  const [placeDetail, setPlaceDetail] = useState<PlaceFields>();
+
   const [error, setError] = useState<Error>();
   const navigate = useNavigate();
 
-  console.log('rendered');
-
+  const edit = eventId !== '0'; // 0 indicates new event
   const dateOptions = [];
+
+  useEffect(() => {
+    async function readEvent() {
+      try {
+        const [{ eventName, eventDate, startTime, endTime, notes, gPlace }] =
+          await fetchEvent(1, Number(tripId), Number(eventId));
+        setEventName(eventName);
+        const eventDateFormatted = DateTime.fromISO(
+          new Date(eventDate).toISOString()
+        ).toISO();
+        setEventDate(eventDateFormatted as string);
+        setStartTime(
+          DateTime.fromISO(startTime).toLocaleString(DateTime.TIME_24_SIMPLE)
+        );
+        setEndTime(
+          DateTime.fromISO(endTime).toLocaleString(DateTime.TIME_24_SIMPLE)
+        );
+        setNotes(notes);
+        setPlaceDetail(JSON.parse(gPlace));
+      } catch (error) {
+        setError(error as Error);
+      }
+    }
+    if (edit) readEvent();
+  }, [eventId, tripId, edit]);
 
   if (startDate && endDate) {
     const startDateLuxon = DateTime.fromISO(new Date(startDate).toISOString());
@@ -61,7 +87,8 @@ export default function EventEntryForm() {
 
   function handleSearch(place: GPlace) {
     setSearchResult(place);
-    const placeDetails = searchResult?.getPlace() as PlaceFields;
+    setPlaceDetail(place.getPlace() as PlaceFields);
+    const placeDetails = place?.getPlace() as PlaceFields;
     if (placeDetails && placeDetails.types.length > 1) {
       const { name, formatted_address, formatted_phone_number, website } =
         placeDetails;
@@ -77,18 +104,20 @@ export default function EventEntryForm() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
+    const timeZoneHourOffset =
+      DateTime.now().toUTC().hour - DateTime.now().hour;
+
     const startTimeHrMin = {
-      hour: DateTime.fromISO(startTime).hour,
+      hour: DateTime.fromISO(startTime).hour + timeZoneHourOffset,
       minute: DateTime.fromISO(startTime).minute,
     };
 
     const endTimeHrMin = {
-      hour: DateTime.fromISO(endTime).hour,
+      hour: DateTime.fromISO(endTime).hour + timeZoneHourOffset,
       minute: DateTime.fromISO(endTime).minute,
     };
 
-    const { name, geometry, place_id } =
-      searchResult?.getPlace() as PlaceFields;
+    const { name, geometry, place_id } = placeDetail as PlaceFields;
 
     const newEventEntry = {
       userId: 1,
@@ -102,13 +131,22 @@ export default function EventEntryForm() {
       location: name,
       notes,
       placeId: place_id,
-      lat: geometry.location.lat(),
-      lng: geometry.location.lng(),
+      lat: isNaN(Number(geometry.location.lat))
+        ? geometry.location?.lat()
+        : Number(geometry.location.lat),
+      lng: isNaN(Number(geometry.location.lng))
+        ? geometry.location?.lng()
+        : Number(geometry.location.lng),
+      gPlace: JSON.stringify(placeDetail),
     };
 
     try {
-      await addEvent(newEventEntry);
-      console.log('newEventEntry submitted:', newEventEntry);
+      if (edit) {
+        console.log({ ...newEventEntry, eventId: Number(eventId) });
+        await updateEvent({ ...newEventEntry, eventId: Number(eventId) });
+      } else {
+        await addEvent(newEventEntry);
+      }
     } catch (error) {
       setError(error as Error);
     } finally {
@@ -162,6 +200,7 @@ export default function EventEntryForm() {
         <PlaceSearch
           onChange={(place) => handleSearch(place)}
           newPlace={searchResult}
+          name={placeDetail?.name ?? ''}
         />
         <Label htmlFor="notes" className="mt-1">
           Notes
