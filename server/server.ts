@@ -3,6 +3,8 @@ import express from 'express';
 import errorMiddleware from './lib/error-middleware.js';
 import ClientError from './lib/client-error.js';
 import pg from 'pg';
+import argon2 from 'argon2';
+import jwt from 'jsonwebtoken';
 
 // eslint-disable-next-line no-unused-vars -- Remove when used
 const db = new pg.Pool({
@@ -23,6 +25,61 @@ app.use(express.static(reactStaticDir));
 app.use(express.static(uploadsStaticDir));
 app.use(express.json());
 
+app.post('/api/auth/sign-up', async (req, res, next) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      throw new ClientError(400, 'username and password are required fields');
+    }
+    const hashedPassword = await argon2.hash(password);
+    const sql = `
+      insert into "user" ("username", "hashedPassword", "firstName", "lastName")
+        values ($1, $2, 'ash', 'ketchum')
+        returning "userId", "username"
+    `;
+    const params = [username, hashedPassword];
+    const result = await db.query(sql, params);
+    const [user] = result.rows;
+    res.status(201).json(user);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('/api/auth/sign-in', async (req, res, next) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      throw new ClientError(401, 'invalid login');
+    }
+    const sql = `
+      select "userId",
+            "hashedPassword"
+        from "users"
+        where "username" = $1
+    `;
+    const params = [username];
+    const result = await db.query(sql, params);
+    const [user] = result.rows;
+    if (!user) {
+      throw new ClientError(401, 'invalid login');
+    }
+    const { userId, hashedPassword } = user;
+    const isMatching = await argon2.verify(hashedPassword, password);
+    if (!isMatching) {
+      throw new ClientError(401, 'invalid login');
+    }
+    const payload = { userId, username };
+    if (!process.env.TOKEN_SECRET) {
+      throw new Error('TOKEN_SECRET not found in .env');
+    }
+    const token = jwt.sign(payload, process.env.TOKEN_SECRET);
+    res.json({ token, user: payload });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // get all the trips for a user
 app.get('/api/user/:userId/trips', async (req, res) => {
   const { userId } = req.params;
@@ -37,19 +94,6 @@ app.get('/api/user/:userId/trips', async (req, res) => {
   const data = result.rows;
   res.json(data);
 });
-
-// app.get('/api/user/:userId/trip/:tripId', async (req, res) => {
-//   const { userId, tripId } = req.params;
-//   const sql = `
-//         select *
-//         from "trip"
-//         where "userId" = $1 and "tripId" = $2;
-//   `;
-//   const params = [userId, tripId];
-//   const result = await db.query(sql, params);
-//   const data = result.rows;
-//   res.json(data);
-// });
 
 app.get('/api/user/:userId/trip/:tripId', async (req, res, next) => {
   try {
