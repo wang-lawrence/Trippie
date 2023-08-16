@@ -2,9 +2,12 @@ import 'dotenv/config';
 import express from 'express';
 import errorMiddleware from './lib/error-middleware.js';
 import ClientError from './lib/client-error.js';
+import { authMiddleware } from './lib/authorization-middleware.js';
+// import { validateUser } from './lib/validate.js';
 import pg from 'pg';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
+import { validateUser } from './lib/validate.js';
 
 // eslint-disable-next-line no-unused-vars -- Remove when used
 const db = new pg.Pool({
@@ -83,23 +86,29 @@ app.post('/api/auth/sign-in', async (req, res, next) => {
 });
 
 // get all the trips for a user
-app.get('/api/user/:userId/trips', async (req, res) => {
-  const { userId } = req.params;
-  const sql = `
-        select *
-        from "trip"
-        where "userId" = $1
-        order by "startDate";
-  `;
-  const params = [userId];
-  const result = await db.query(sql, params);
-  const data = result.rows;
-  res.json(data);
+app.get('/api/trips', authMiddleware, async (req, res, next) => {
+  try {
+    const userId = validateUser(req.user);
+    // const { userId } = req.params;
+    const sql = `
+          select *
+          from "trip"
+          where "userId" = $1
+          order by "startDate";
+    `;
+    const params = [userId];
+    const result = await db.query(sql, params);
+    const data = result.rows;
+    res.json(data);
+  } catch (err) {
+    next(err);
+  }
 });
 
-app.get('/api/user/:userId/trip/:tripId', async (req, res, next) => {
+app.get('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
   try {
-    const { userId, tripId } = req.params;
+    const userId = validateUser(req.user);
+    const { tripId } = req.params;
     const sql = `
           select  "t".*,
                   "e"."eventId",
@@ -130,22 +139,27 @@ app.get('/api/user/:userId/trip/:tripId', async (req, res, next) => {
   }
 });
 
-app.post('/api/trip', async (req, res) => {
-  const { userId, tripName, startDate, endDate, iconUrl } = req.body;
-  const sql = `
-        insert into  "trip" ("userId", "tripName", "startDate", "endDate", "iconUrl")
-        values ($1, $2, $3, $4, $5)
-        returning *;
-  `;
-  const params = [userId, tripName, startDate, endDate, iconUrl];
-  const result = await db.query(sql, params);
-  const data = result.rows;
-  res.json(data);
+app.post('/api/trip', authMiddleware, async (req, res, next) => {
+  try {
+    const userId = validateUser(req.user);
+    const { tripName, startDate, endDate, iconUrl } = req.body;
+    const sql = `
+          insert into  "trip" ("userId", "tripName", "startDate", "endDate", "iconUrl")
+          values ($1, $2, $3, $4, $5)
+          returning *;
+    `;
+    const params = [userId, tripName, startDate, endDate, iconUrl];
+    const result = await db.query(sql, params);
+    const data = result.rows;
+    res.json(data);
+  } catch (err) {
+    next(err);
+  }
 });
 
-app.put('/api/user/:userId/trip/:tripId', async (req, res, next) => {
+app.put('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
   try {
-    const userId = Number(req.params.userId);
+    const userId = validateUser(req.user);
     const tripId = Number(req.params.tripId);
     const { tripName, startDate, endDate, iconUrl } = req.body;
     if (!userId || !tripId || !tripName || !startDate || !endDate || !iconUrl) {
@@ -166,7 +180,7 @@ app.put('/api/user/:userId/trip/:tripId', async (req, res, next) => {
     if (data) {
       res.status(200).json(data);
     } else {
-      throw new ClientError(404, `Cannot find trip`);
+      throw new ClientError(404, `Cannot find trip ID ${tripId}`);
     }
   } catch (err) {
     next(err);

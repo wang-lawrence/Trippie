@@ -124,7 +124,7 @@ export default function EventEntryForm() {
     const { name, geometry, place_id } = placeDetail as PlaceFields;
 
     const newEventEntry = {
-      userId: 1,
+      // userId: 1,
       tripId: Number(tripId),
       eventName,
       eventDate: new Date(eventDate),

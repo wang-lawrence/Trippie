@@ -18,7 +18,7 @@ export default function useFindTrip(
   useEffect(() => {
     async function readTrips(): Promise<void> {
       try {
-        const activeTrip = await fetchTrip(userId, tripId);
+        const activeTrip = await fetchTrip(tripId);
         if (activeTrip.length === 0) {
           throw new Error('Trip not found');
         }

@@ -82,19 +82,30 @@ export const placeholder: TripEvents = {
   gPlace: '',
 };
 
-export async function fetchAllTrips(userId: number): Promise<TripEntry[]> {
-  const res = await fetch(`/api/user/${userId}/trips`);
+export async function fetchAllTrips(): Promise<TripEntry[]> {
+  const reqConfig = {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+    },
+  };
+  console.log('reqConfig', reqConfig);
+  const res = await fetch(`/api/trips`, reqConfig);
   if (!res.ok) {
     throw new Error(`Error status ${res.status}`);
   }
+
   return await res.json();
 }
 
-export async function fetchTrip(
-  userId: number,
-  tripId: number
-): Promise<TripEvents[]> {
-  const res = await fetch(`/api/user/${userId}/trip/${tripId}`);
+export async function fetchTrip(tripId: number): Promise<TripEvents[]> {
+  const reqConfig = {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+    },
+  };
+  const res = await fetch(`/api/trip/${tripId}`, reqConfig);
   if (!res.ok) {
     throw new Error(`Error status ${res.status}`);
   }
@@ -109,6 +120,7 @@ export async function addTrip(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${sessionStorage.getItem('token')}`,
     },
     body: JSON.stringify(newTrip),
   };
@@ -126,13 +138,11 @@ export async function updateTrip(
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${sessionStorage.getItem('token')}`,
     },
     body: JSON.stringify(editTrip),
   };
-  const res = await fetch(
-    `/api/user/${editTrip.userId}/trip/${editTrip.tripId}`,
-    reqConfig
-  );
+  const res = await fetch(`/api/trip/${editTrip.tripId}`, reqConfig);
   if (!res.ok) {
     throw new Error(`Error status ${res.status}`);
   }

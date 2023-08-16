@@ -10,7 +10,7 @@ export default function SavedTrips() {
   useEffect(() => {
     async function readTrips(userId: number): Promise<void> {
       try {
-        const userTrips = await fetchAllTrips(userId);
+        const userTrips = await fetchAllTrips();
         setTrips(userTrips);
       } catch (error) {
         setError(error as Error);

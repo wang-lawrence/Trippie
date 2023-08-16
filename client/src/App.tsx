@@ -14,8 +14,6 @@ import AuthPage from './Pages/AuthPage';
 import NotFound from './Pages/NotFound';
 import { placeholder, TripEntry, TripEvents } from './lib/data';
 
-const tokenKey = 'react-context-jwt';
-
 function App() {
   const [user, setUser] = useState<User>();
   const [token, setToken] = useState<string>();
@@ -23,13 +21,13 @@ function App() {
   const navigate = useNavigate();
 
   function handleSignIn(auth: Auth) {
-    sessionStorage.setItem(tokenKey, JSON.stringify(auth));
+    sessionStorage.setItem('token', auth.token);
     setUser(auth.user);
     setToken(auth.token);
   }
 
   function handleSignOut() {
-    sessionStorage.removeItem(tokenKey);
+    sessionStorage.removeItem('token');
     setUser(undefined);
     setToken(undefined);
   }
