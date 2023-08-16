@@ -105,8 +105,11 @@ export default function EventEntryForm() {
     e.preventDefault();
 
     const timeZoneHourOffset =
-      (DateTime.utc().day - DateTime.now().day) * 24 +
-      (DateTime.utc().hour - DateTime.now().hour);
+      (DateTime.fromISO(eventDate).toUTC().day -
+        DateTime.fromISO(eventDate).day) *
+        24 +
+      (DateTime.fromISO(eventDate).toUTC().hour -
+        DateTime.fromISO(eventDate).hour);
 
     const startTimeHrMin = {
       hour: DateTime.fromISO(startTime).hour + timeZoneHourOffset,
