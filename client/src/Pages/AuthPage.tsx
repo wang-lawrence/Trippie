@@ -1,6 +1,5 @@
-import React, { useContext, useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaBolt } from 'react-icons/fa';
 import AuthForm from '../components/AuthForm';
 import UserContext from '../components/UserContext';
 
@@ -15,21 +14,16 @@ export default function AuthPage({ action }: Props) {
     if (user) navigate('/');
   }, [user, navigate]);
 
-  const welcomeMessage =
-    action === 'sign-in'
-      ? 'Please sign in to continue'
-      : 'Create an account to get started!';
+  const welcomeMessage = action === 'sign-in' ? 'Sign In' : 'Create Account';
   return (
-    <div className="row pt-5 align-items-center">
-      <div className="col-12 offset-0 col-sm-10 offset-sm-1 col-md-8 offset-md-2 col-xl-4 offset-xl-4">
-        <header className="text-center">
-          <h2 className="mb-2">
-            <FaBolt className="mr-2" />
-            Awesome App
+    <div className="bg-img">
+      <div className="container roboto">
+        <header className="text-center mt-5 lg:mt-8 h-20">
+          <h2 className="mb-4 text-3xl font-semibold tracking-wide">
+            {welcomeMessage}
           </h2>
-          <p className="text-muted mb-4">{welcomeMessage}</p>
         </header>
-        <div className="card p-3 ">
+        <div className="flex justify-center p-3">
           <AuthForm key={action} action={action} onSignIn={handleSignIn} />
         </div>
       </div>

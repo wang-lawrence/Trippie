@@ -1,4 +1,6 @@
 export type User = {
+  firstName: string;
+  lastName: string;
   userId: number;
   username: string;
 };
@@ -22,9 +24,11 @@ export async function signIn(
  */
 export async function signUp(
   username: string,
-  password: string
+  password: string,
+  firstName: string,
+  lastName: string
 ): Promise<User> {
-  return await signUpOrIn('sign-up', username, password);
+  return await signUpOrIn('sign-up', username, password, firstName, lastName);
 }
 
 /**
@@ -33,24 +37,30 @@ export async function signUp(
 async function signUpOrIn(
   action: 'sign-up',
   username: string,
-  password: string
+  password: string,
+  firstName: string,
+  lastName: string
 ): Promise<User>;
+
 async function signUpOrIn(
   action: 'sign-in',
   username: string,
   password: string
 ): Promise<Auth>;
+
 async function signUpOrIn(
   action: 'sign-up' | 'sign-in',
   username: string,
-  password: string
+  password: string,
+  firstName?: string,
+  lastName?: string
 ): Promise<User | Auth> {
   const req = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ username, password, firstName, lastName }),
   };
   const res = await fetch(`/api/auth/${action}`, req);
   if (!res.ok) throw new Error(`fetch Error ${res.status}`);

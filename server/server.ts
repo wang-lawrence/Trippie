@@ -27,17 +27,17 @@ app.use(express.json());
 
 app.post('/api/auth/sign-up', async (req, res, next) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, firstName, lastName } = req.body;
     if (!username || !password) {
       throw new ClientError(400, 'username and password are required fields');
     }
     const hashedPassword = await argon2.hash(password);
     const sql = `
       insert into "user" ("username", "hashedPassword", "firstName", "lastName")
-        values ($1, $2, 'ash', 'ketchum')
-        returning "userId", "username"
+        values ($1, $2, $3, $4)
+        returning "userId", "username", "firstName"
     `;
-    const params = [username, hashedPassword];
+    const params = [username, hashedPassword, firstName, lastName];
     const result = await db.query(sql, params);
     const [user] = result.rows;
     res.status(201).json(user);
@@ -48,7 +48,7 @@ app.post('/api/auth/sign-up', async (req, res, next) => {
 
 app.post('/api/auth/sign-in', async (req, res, next) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, firstName } = req.body;
     if (!username || !password) {
       throw new ClientError(401, 'invalid login');
     }
@@ -69,7 +69,7 @@ app.post('/api/auth/sign-in', async (req, res, next) => {
     if (!isMatching) {
       throw new ClientError(401, 'invalid login');
     }
-    const payload = { userId, username };
+    const payload = { userId, username, firstName };
     if (!process.env.TOKEN_SECRET) {
       throw new Error('TOKEN_SECRET not found in .env');
     }

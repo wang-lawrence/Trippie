@@ -53,7 +53,6 @@ function App() {
               element={<TripEditForm editTrip={editTrip} />}
             />
             <Route path="saved-trips" element={<SavedTrips />} />
-            <Route path="sign-up" element={<AuthPage action="sign-up" />} />
             <Route
               path="trip-details/:tripId"
               element={<TripDetails onClick={handleEditTripSubmit} />}
@@ -62,6 +61,8 @@ function App() {
               path="trip-details/:tripId/event-form/start/:startDate/end/:endDate/:eventId"
               element={<EventEntryForm />}
             />
+            <Route path="sign-up" element={<AuthPage action="sign-up" />} />
+            <Route path="sign-in" element={<AuthPage action="sign-in" />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
