@@ -48,15 +48,17 @@ app.post('/api/auth/sign-up', async (req, res, next) => {
 
 app.post('/api/auth/sign-in', async (req, res, next) => {
   try {
-    const { username, password, firstName } = req.body;
+    const { username, password } = req.body;
     if (!username || !password) {
       throw new ClientError(401, 'invalid login');
     }
     const sql = `
       select "userId",
-            "hashedPassword"
-        from "users"
-        where "username" = $1
+             "hashedPassword",
+             "firstName",
+             "lastName"
+        from "user"
+        where "username" = $1;
     `;
     const params = [username];
     const result = await db.query(sql, params);
@@ -64,12 +66,12 @@ app.post('/api/auth/sign-in', async (req, res, next) => {
     if (!user) {
       throw new ClientError(401, 'invalid login');
     }
-    const { userId, hashedPassword } = user;
+    const { userId, hashedPassword, firstName, lastName } = user;
     const isMatching = await argon2.verify(hashedPassword, password);
     if (!isMatching) {
       throw new ClientError(401, 'invalid login');
     }
-    const payload = { userId, username, firstName };
+    const payload = { userId, username, firstName, lastName };
     if (!process.env.TOKEN_SECRET) {
       throw new Error('TOKEN_SECRET not found in .env');
     }

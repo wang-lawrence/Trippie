@@ -79,11 +79,11 @@ export default function TripDetails({ onClick }: TripProps) {
     try {
       await deleteEvent(1, Number(tripId), eventId);
       setDeletedId(eventId);
+      setShowMap(!showMap);
+      setTimeout(() => setShowMap(showMap), 650);
     } catch (error) {
       setError(error as Error);
     } finally {
-      setShowMap(!showMap);
-      setTimeout(() => setShowMap(showMap), 650);
     }
   }
 

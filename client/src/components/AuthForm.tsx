@@ -21,12 +21,13 @@ export default function AuthForm({ action, onSignIn }: Props) {
       lastName: string
     ) {
       await signUp(username, password, firstName, lastName);
-      // navigate('/sign-in');
+      navigate('/sign-in');
     }
     async function handleSignIn(username: string, password: string) {
       const auth = await signIn(username, password);
       if (auth.user && auth.token) {
         onSignIn(auth);
+        navigate('/saved-trips');
       }
     }
     event.preventDefault();
