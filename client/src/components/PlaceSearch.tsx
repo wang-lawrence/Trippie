@@ -32,12 +32,7 @@ export default function PlaceSearch({
   }
 
   function onPlaceChanged() {
-    if (newPlace !== undefined) {
-      console.log(newPlace.getPlace());
-      onChange(newPlace);
-    } else {
-      alert('Please enter text');
-    }
+    if (newPlace !== undefined) onChange(newPlace);
   }
 
   if (!isLoaded) {

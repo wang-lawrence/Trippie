@@ -19,7 +19,7 @@ import { addEvent, fetchEvent, updateEvent } from '../lib/data';
 type PlaceFields = {
   name: string;
   geometry: {
-    location: { lat: () => number | number; lng: () => number | number };
+    location: { lat: () => number; lng: () => number };
     viewport: object;
   };
   website: string;
@@ -105,7 +105,11 @@ export default function EventEntryForm() {
     e.preventDefault();
 
     const timeZoneHourOffset =
-      DateTime.now().toUTC().hour - DateTime.now().hour;
+      (DateTime.fromISO(eventDate).toUTC().day -
+        DateTime.fromISO(eventDate).day) *
+        24 +
+      (DateTime.fromISO(eventDate).toUTC().hour -
+        DateTime.fromISO(eventDate).hour);
 
     const startTimeHrMin = {
       hour: DateTime.fromISO(startTime).hour + timeZoneHourOffset,
@@ -142,7 +146,6 @@ export default function EventEntryForm() {
 
     try {
       if (edit) {
-        console.log({ ...newEventEntry, eventId: Number(eventId) });
         await updateEvent({ ...newEventEntry, eventId: Number(eventId) });
       } else {
         await addEvent(newEventEntry);

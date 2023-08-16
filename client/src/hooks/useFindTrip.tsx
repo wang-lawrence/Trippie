@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { TripEntry, TripEvents, fetchTrip, placeholder } from '../lib/data';
+import { TripEvents, fetchTrip, placeholder } from '../lib/data';
 
 type FindTripState = {
   trip?: TripEvents[];
