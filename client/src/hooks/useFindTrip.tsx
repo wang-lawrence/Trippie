@@ -26,7 +26,6 @@ export default function useFindTrip(
       } catch (err) {
         setError(err as Error);
       }
-      console.log('use toast here to display deleted event later', deletedId);
     }
     readTrips();
   }, [userId, tripId, deletedId]);

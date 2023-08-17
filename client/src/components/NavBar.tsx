@@ -1,6 +1,9 @@
 import { Link, Outlet } from 'react-router-dom';
+import { useContext } from 'react';
+import UserContext from './UserContext';
 
 export default function NavBar() {
+  const { user, handleSignOut } = useContext(UserContext);
   return (
     <>
       <div className="bg-gray-100 py-3">
@@ -15,9 +18,15 @@ export default function NavBar() {
             <Link to="/saved-trips" className="roboto pl-5 text-md font-light">
               Saved Trips
             </Link>
-            <Link to="/sign-in" className="roboto pl-5 text-md font-light">
-              Sign In/Up
-            </Link>
+            {user ? (
+              <Link to="/sign-in" className="roboto pl-5 text-md font-light">
+                <span onClick={handleSignOut}>Log Out</span>
+              </Link>
+            ) : (
+              <Link to="/sign-in" className="roboto pl-5 text-md font-light">
+                Sign In/Up
+              </Link>
+            )}
           </nav>
         </div>
       </div>
