@@ -22,10 +22,11 @@ import {
   PopoverTrigger,
   PopoverClose,
 } from '../components/ui/popover';
-// import { toast } from "@/src/components/ui/use-toast"
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import UserContext from '../components/UserContext';
 import { addTrip, icons } from '../lib/data';
 import { useNavigate } from 'react-router-dom';
+import RedirectLogIn from './RedirectLogIn';
 
 const FormSchema = z.object({
   tripName: z.string().min(1, {
@@ -44,6 +45,7 @@ type TripFormValues = z.infer<typeof FormSchema>;
 export default function TripEntryForm() {
   const [error, setError] = useState<Error>();
   const navigate = useNavigate();
+  const { user } = useContext(UserContext);
 
   const defaultValues: Partial<TripFormValues> = {
     tripName: undefined,
@@ -70,6 +72,8 @@ export default function TripEntryForm() {
       navigate('/saved-trips');
     }
   }
+
+  if (!user) return <RedirectLogIn />;
 
   if (error) return <h1>{`Fetch error ${error.message}`}</h1>;
 

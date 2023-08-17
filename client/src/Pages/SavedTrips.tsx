@@ -1,11 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
+import UserContext from '../components/UserContext';
 import { fetchAllTrips, TripEntry } from '../lib/data';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
+import RedirectLogIn from './RedirectLogIn';
 
 export default function SavedTrips() {
   const [trips, setTrips] = useState<TripEntry[]>([]);
   const [error, setError] = useState<Error>();
+  const { user } = useContext(UserContext);
 
   useEffect(() => {
     async function readTrips(userId: number): Promise<void> {
@@ -18,6 +21,8 @@ export default function SavedTrips() {
     }
     readTrips(1);
   }, []);
+
+  if (!user) return <RedirectLogIn />;
 
   if (error) return <h1>{`Fetch error: ${error.message}`}</h1>;
 
