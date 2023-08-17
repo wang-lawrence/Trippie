@@ -187,17 +187,18 @@ app.put('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
   }
 });
 
-app.delete('/api/user/:userId/trip/:tripId', async (req, res, next) => {
+app.delete('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
   try {
-    const userId = Number(req.params.userId);
+    const userId = validateUser(req.user);
     const tripId = Number(req.params.tripId);
     if (!Number.isInteger(userId) || !Number.isInteger(tripId)) {
       throw new ClientError(400, 'Missing user or trip parameters');
     }
+    // check that the user has access to delete event by checking the tripId for the events belong to the user
     const sql1 = `
             delete
               from "event"
-              where "tripId" = $1
+              where "tripId" in (select "tripId" from "trip" where "userId" = $1 and "tripId" = $2)
               returning *;
           `;
     const sql2 = `
@@ -206,10 +207,9 @@ app.delete('/api/user/:userId/trip/:tripId', async (req, res, next) => {
               where "userId" = $1 and "tripId" = $2
               returning *;
           `;
-    const params1 = [tripId];
-    const params2 = [userId, tripId];
-    await db.query(sql1, params1);
-    const result = await db.query(sql2, params2);
+    const params = [userId, tripId];
+    await db.query(sql1, params);
+    const result = await db.query(sql2, params);
     const trip = result.rows[0];
     if (trip) {
       res.sendStatus(204);

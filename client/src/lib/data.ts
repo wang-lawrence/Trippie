@@ -89,7 +89,6 @@ export async function fetchAllTrips(): Promise<TripEntry[]> {
       Authorization: `Bearer ${sessionStorage.getItem('token')}`,
     },
   };
-  console.log('reqConfig', reqConfig);
   const res = await fetch(`/api/trips`, reqConfig);
   if (!res.ok) {
     throw new Error(`Error status ${res.status}`);
@@ -149,14 +148,14 @@ export async function updateTrip(
   return await res.json();
 }
 
-export async function deleteTrip(
-  userId: number,
-  tripId: number
-): Promise<TripEntry[]> {
+export async function deleteTrip(tripId: number): Promise<TripEntry[]> {
   const reqConfig = {
     method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+    },
   };
-  const res = await fetch(`/api/user/${userId}/trip/${tripId}`, reqConfig);
+  const res = await fetch(`/api/trip/${tripId}`, reqConfig);
   if (!res.ok) {
     throw new Error(`Error status ${res.status}`);
   }

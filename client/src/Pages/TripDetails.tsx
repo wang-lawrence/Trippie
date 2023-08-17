@@ -67,7 +67,7 @@ export default function TripDetails({ onClick }: TripProps) {
 
   async function handleDeleteTrip() {
     try {
-      await deleteTrip(1, Number(tripId));
+      await deleteTrip(Number(tripId));
     } catch (error) {
       setError(error as Error);
     } finally {
