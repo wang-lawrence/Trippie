@@ -67,7 +67,7 @@ export default function TripDetails({ onClick }: TripProps) {
 
   async function handleDeleteTrip() {
     try {
-      await deleteTrip(1, Number(tripId));
+      await deleteTrip(Number(tripId));
     } catch (error) {
       setError(error as Error);
     } finally {
@@ -77,13 +77,13 @@ export default function TripDetails({ onClick }: TripProps) {
 
   async function handleDeleteEvent(eventId: number) {
     try {
-      await deleteEvent(1, Number(tripId), eventId);
+      await deleteEvent(Number(tripId), eventId);
       setDeletedId(eventId);
+      setShowMap(!showMap);
+      setTimeout(() => setShowMap(showMap), 650);
     } catch (error) {
       setError(error as Error);
     } finally {
-      setShowMap(!showMap);
-      setTimeout(() => setShowMap(showMap), 650);
     }
   }
 

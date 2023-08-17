@@ -48,8 +48,8 @@ export default function EventEntryForm() {
   useEffect(() => {
     async function readEvent() {
       try {
-        const [{ eventName, eventDate, startTime, endTime, notes, gPlace }] =
-          await fetchEvent(1, Number(tripId), Number(eventId));
+        const { eventName, eventDate, startTime, endTime, notes, gPlace } =
+          await fetchEvent(Number(tripId), Number(eventId));
         setEventName(eventName);
         const eventDateFormatted = DateTime.fromISO(
           new Date(eventDate).toISOString()
@@ -124,7 +124,6 @@ export default function EventEntryForm() {
     const { name, geometry, place_id } = placeDetail as PlaceFields;
 
     const newEventEntry = {
-      userId: 1,
       tripId: Number(tripId),
       eventName,
       eventDate: new Date(eventDate),

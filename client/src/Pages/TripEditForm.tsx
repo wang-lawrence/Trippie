@@ -3,7 +3,6 @@ import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-
 import { cn } from '../lib/utils';
 import { Button } from '../components/ui/button';
 import { Calendar } from '../components/ui/calendar';
@@ -22,9 +21,8 @@ import {
   PopoverTrigger,
   PopoverClose,
 } from '../components/ui/popover';
-// import { toast } from "@/src/components/ui/use-toast"
 import { useState } from 'react';
-import { updateTrip, TripEntry, TripEvents } from '../lib/data';
+import { updateTrip, TripEvents } from '../lib/data';
 import { Link, useNavigate } from 'react-router-dom';
 
 const FormSchema = z.object({
@@ -65,7 +63,7 @@ export default function TripEditForm({ editTrip }: Props) {
   // send updated form data to database
   async function onSubmit(data: TripFormValues) {
     try {
-      await updateTrip({ ...data, userId: 1, tripId: Number(tripId), iconUrl });
+      await updateTrip({ ...data, tripId: Number(tripId), iconUrl });
     } catch (error) {
       setError(error as Error);
     } finally {
@@ -75,6 +73,7 @@ export default function TripEditForm({ editTrip }: Props) {
 
   if (error) return <h1>{`Fetch Error: ${error.message}`}</h1>;
 
+  // form code from shadcn component library
   return (
     <div className="bg-img">
       <div className="container">
