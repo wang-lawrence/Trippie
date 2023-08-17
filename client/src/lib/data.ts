@@ -169,13 +169,11 @@ export async function addEvent(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${sessionStorage.getItem('token')}`,
     },
     body: JSON.stringify(newEvent),
   };
-  const res = await fetch(
-    `/api/user/${newEvent.userId}/trip/${newEvent.tripId}`,
-    reqConfig
-  );
+  const res = await fetch(`/api/trip/${newEvent.tripId}`, reqConfig);
   if (!res.ok) {
     throw new Error(`Error status ${res.status}`);
   }

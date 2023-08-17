@@ -3,11 +3,11 @@ import express from 'express';
 import errorMiddleware from './lib/error-middleware.js';
 import ClientError from './lib/client-error.js';
 import { authMiddleware } from './lib/authorization-middleware.js';
-// import { validateUser } from './lib/validate.js';
+// import { validateLoggedIn } from './lib/validate.js';
 import pg from 'pg';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
-import { validateUser } from './lib/validate.js';
+import { validateLoggedIn, validateUser } from './lib/validate.js';
 
 // eslint-disable-next-line no-unused-vars -- Remove when used
 const db = new pg.Pool({
@@ -88,7 +88,7 @@ app.post('/api/auth/sign-in', async (req, res, next) => {
 // get all the trips for a user
 app.get('/api/trips', authMiddleware, async (req, res, next) => {
   try {
-    const userId = validateUser(req.user);
+    const userId = validateLoggedIn(req.user);
     // const { userId } = req.params;
     const sql = `
           select *
@@ -107,7 +107,7 @@ app.get('/api/trips', authMiddleware, async (req, res, next) => {
 
 app.get('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
   try {
-    const userId = validateUser(req.user);
+    const userId = validateLoggedIn(req.user);
     const { tripId } = req.params;
     const sql = `
           select  "t".*,
@@ -141,7 +141,7 @@ app.get('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
 
 app.post('/api/trip', authMiddleware, async (req, res, next) => {
   try {
-    const userId = validateUser(req.user);
+    const userId = validateLoggedIn(req.user);
     const { tripName, startDate, endDate, iconUrl } = req.body;
     const sql = `
           insert into  "trip" ("userId", "tripName", "startDate", "endDate", "iconUrl")
@@ -159,7 +159,7 @@ app.post('/api/trip', authMiddleware, async (req, res, next) => {
 
 app.put('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
   try {
-    const userId = validateUser(req.user);
+    const userId = validateLoggedIn(req.user);
     const tripId = Number(req.params.tripId);
     const { tripName, startDate, endDate, iconUrl } = req.body;
     if (!userId || !tripId || !tripName || !startDate || !endDate || !iconUrl) {
@@ -189,7 +189,7 @@ app.put('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
 
 app.delete('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
   try {
-    const userId = validateUser(req.user);
+    const userId = validateLoggedIn(req.user);
     const tripId = Number(req.params.tripId);
     if (!Number.isInteger(userId) || !Number.isInteger(tripId)) {
       throw new ClientError(400, 'Missing user or trip parameters');
@@ -221,9 +221,10 @@ app.delete('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
   }
 });
 
-app.post(`/api/user/:userId/trip/:tripId`, async (req, res, next) => {
+app.post(`/api/trip/:tripId`, authMiddleware, async (req, res, next) => {
   try {
     const {
+      userId,
       tripId,
       eventName,
       eventDate,
@@ -236,6 +237,8 @@ app.post(`/api/user/:userId/trip/:tripId`, async (req, res, next) => {
       lng,
       gPlace,
     } = req.body;
+    const authUserId = validateLoggedIn(req.user);
+    validateUser(userId, authUserId);
     const sql = `
           insert into "event" ("tripId", "eventName", "eventDate", "startTime", "endTime", "location", "notes", "placeId", "lat", "lng", "gPlace")
           values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
