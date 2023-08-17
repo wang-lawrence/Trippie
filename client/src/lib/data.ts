@@ -91,7 +91,8 @@ export async function fetchAllTrips(): Promise<TripEntry[]> {
   };
   const res = await fetch(`/api/trips`, reqConfig);
   if (!res.ok) {
-    throw new Error(`Error status ${res.status}`);
+    const err = await res.json();
+    throw new Error(`Error status ${res.status}: ${err.error}`);
   }
 
   return await res.json();
@@ -106,7 +107,8 @@ export async function fetchTrip(tripId: number): Promise<TripEvents[]> {
   };
   const res = await fetch(`/api/trip/${tripId}`, reqConfig);
   if (!res.ok) {
-    throw new Error(`Error status ${res.status}`);
+    const err = await res.json();
+    throw new Error(`Error status ${res.status}: ${err.error}`);
   }
   const trip = await res.json();
   return trip;
@@ -125,7 +127,8 @@ export async function addTrip(
   };
   const res = await fetch('/api/trip', reqConfig);
   if (!res.ok) {
-    throw new Error(`Error status ${res.status}`);
+    const err = await res.json();
+    throw new Error(`Error status ${res.status}: ${err.error}`);
   }
   return await res.json();
 }
@@ -143,7 +146,8 @@ export async function updateTrip(
   };
   const res = await fetch(`/api/trip/${editTrip.tripId}`, reqConfig);
   if (!res.ok) {
-    throw new Error(`Error status ${res.status}`);
+    const err = await res.json();
+    throw new Error(`Error status ${res.status}: ${err.error}`);
   }
   return await res.json();
 }
@@ -157,7 +161,8 @@ export async function deleteTrip(tripId: number): Promise<TripEntry[]> {
   };
   const res = await fetch(`/api/trip/${tripId}`, reqConfig);
   if (!res.ok) {
-    throw new Error(`Error status ${res.status}`);
+    const err = await res.json();
+    throw new Error(`Error status ${res.status}: ${err.error}`);
   }
   return await res.json();
 }
@@ -175,21 +180,26 @@ export async function addEvent(
   };
   const res = await fetch(`/api/trip/${newEvent.tripId}`, reqConfig);
   if (!res.ok) {
-    throw new Error(`Error status ${res.status}`);
+    const err = await res.json();
+    throw new Error(`Error status ${res.status}: ${err.error}`);
   }
   return await res.json();
 }
 
 export async function fetchEvent(
-  userId: number,
   tripId: number,
   eventId: number
-): Promise<TripEvents[]> {
-  const res = await fetch(
-    `/api/user/${userId}/trip/${tripId}/event/${eventId}`
-  );
+): Promise<TripEvents> {
+  const reqConfig = {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+    },
+  };
+  const res = await fetch(`/api/trip/${tripId}/event/${eventId}`, reqConfig);
   if (!res.ok) {
-    throw new Error(`Error status ${res.status}`);
+    const err = await res.json();
+    throw new Error(`Error status ${res.status}: ${err.error}`);
   }
   const event = await res.json();
   return event;
@@ -202,33 +212,35 @@ export async function updateEvent(
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${sessionStorage.getItem('token')}`,
     },
     body: JSON.stringify(editEvent),
   };
   const res = await fetch(
-    `/api/user/${editEvent.userId}/trip/${editEvent.tripId}/event/${editEvent.eventId}`,
+    `/api/trip/${editEvent.tripId}/event/${editEvent.eventId}`,
     reqConfig
   );
   if (!res.ok) {
-    throw new Error(`Error status ${res.status}`);
+    const err = await res.json();
+    throw new Error(`Error status ${res.status}: ${err.error}`);
   }
   return await res.json();
 }
 
 export async function deleteEvent(
-  userId: number,
   tripId: number,
   eventId: number
 ): Promise<TripEntry[]> {
   const reqConfig = {
     method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+    },
   };
-  const res = await fetch(
-    `/api/user/${userId}/trip/${tripId}/event/${eventId}`,
-    reqConfig
-  );
+  const res = await fetch(`/api/trip/${tripId}/event/${eventId}`, reqConfig);
   if (!res.ok) {
-    throw new Error(`Error status ${res.status}`);
+    const err = await res.json();
+    throw new Error(`Error status ${res.status}: ${err.error}`);
   }
   return await res.json();
 }

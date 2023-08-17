@@ -7,7 +7,7 @@ import { authMiddleware } from './lib/authorization-middleware.js';
 import pg from 'pg';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
-import { validateLoggedIn, validateUser } from './lib/validate.js';
+import { validateLoggedIn, validateParam } from './lib/validate.js';
 
 // eslint-disable-next-line no-unused-vars -- Remove when used
 const db = new pg.Pool({
@@ -31,9 +31,10 @@ app.use(express.json());
 app.post('/api/auth/sign-up', async (req, res, next) => {
   try {
     const { username, password, firstName, lastName } = req.body;
-    if (!username || !password) {
-      throw new ClientError(400, 'username and password are required fields');
-    }
+    // if (!username || !password || !firstName || !lastName) {
+    //   throw new ClientError(400, 'missing required fields');
+    // }
+    validateParam([username, password, firstName, lastName]);
     const hashedPassword = await argon2.hash(password);
     const sql = `
       insert into "user" ("username", "hashedPassword", "firstName", "lastName")
@@ -89,7 +90,6 @@ app.post('/api/auth/sign-in', async (req, res, next) => {
 app.get('/api/trips', authMiddleware, async (req, res, next) => {
   try {
     const userId = validateLoggedIn(req.user);
-    // const { userId } = req.params;
     const sql = `
           select *
           from "trip"
@@ -109,6 +109,7 @@ app.get('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
   try {
     const userId = validateLoggedIn(req.user);
     const { tripId } = req.params;
+    validateParam([tripId]);
     const sql = `
           select  "t".*,
                   "e"."eventId",
@@ -132,7 +133,7 @@ app.get('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
     if (data) {
       res.status(200).json(data);
     } else {
-      throw new ClientError(404, `Cannot find trip`);
+      throw new ClientError(404, `Cannot find trip ID ${tripId}`);
     }
   } catch (err) {
     next(err);
@@ -143,6 +144,7 @@ app.post('/api/trip', authMiddleware, async (req, res, next) => {
   try {
     const userId = validateLoggedIn(req.user);
     const { tripName, startDate, endDate, iconUrl } = req.body;
+    validateParam([tripName, startDate, endDate, iconUrl]);
     const sql = `
           insert into  "trip" ("userId", "tripName", "startDate", "endDate", "iconUrl")
           values ($1, $2, $3, $4, $5)
@@ -162,9 +164,7 @@ app.put('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
     const userId = validateLoggedIn(req.user);
     const tripId = Number(req.params.tripId);
     const { tripName, startDate, endDate, iconUrl } = req.body;
-    if (!userId || !tripId || !tripName || !startDate || !endDate || !iconUrl) {
-      throw new ClientError(400, 'Missing parameter');
-    }
+    validateParam([tripName, startDate, endDate, iconUrl]);
     const sql = `
           update "trip"
             set "tripName" = $1,
@@ -191,9 +191,7 @@ app.delete('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
   try {
     const userId = validateLoggedIn(req.user);
     const tripId = Number(req.params.tripId);
-    if (!Number.isInteger(userId) || !Number.isInteger(tripId)) {
-      throw new ClientError(400, 'Missing user or trip parameters');
-    }
+    validateParam([tripId]);
     // check that the user has access to delete event by checking the tripId for the events belong to the user
     const sql1 = `
             delete
@@ -214,7 +212,7 @@ app.delete('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
     if (trip) {
       res.sendStatus(204);
     } else {
-      throw new ClientError(404, `Cannot find trip`);
+      throw new ClientError(404, `Cannot find trip ID: ${tripId}`);
     }
   } catch (err) {
     next(err);
@@ -222,9 +220,9 @@ app.delete('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
 });
 
 app.post(`/api/trip/:tripId`, authMiddleware, async (req, res, next) => {
+  const userId = validateLoggedIn(req.user);
   try {
     const {
-      userId,
       tripId,
       eventName,
       eventDate,
@@ -237,14 +235,38 @@ app.post(`/api/trip/:tripId`, authMiddleware, async (req, res, next) => {
       lng,
       gPlace,
     } = req.body;
-    const authUserId = validateLoggedIn(req.user);
-    validateUser(userId, authUserId);
-    const sql = `
+    validateParam([
+      tripId,
+      eventName,
+      eventDate,
+      startTime,
+      endTime,
+      location,
+      notes,
+      placeId,
+      lat,
+      lng,
+      gPlace,
+    ]);
+    // check if user has access to the trip being edited
+    const sql1 = `
+          select "tripId" from "trip" where "userId" = $1 and "tripId" = $2
+    `;
+    const params1 = [userId, tripId];
+    const userCheck = await db.query(sql1, params1);
+    if (!userCheck.rows[0])
+      throw new ClientError(
+        404,
+        `User not permitted to edit trip ID: ${tripId}`
+      );
+
+    // add the event once user is verified to have access
+    const sql2 = `
           insert into "event" ("tripId", "eventName", "eventDate", "startTime", "endTime", "location", "notes", "placeId", "lat", "lng", "gPlace")
           values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
           returning *;
     `;
-    const params = [
+    const params2 = [
       tripId,
       eventName,
       eventDate,
@@ -257,7 +279,7 @@ app.post(`/api/trip/:tripId`, authMiddleware, async (req, res, next) => {
       lng,
       gPlace,
     ];
-    const result = await db.query(sql, params);
+    const result = await db.query(sql2, params2);
     const data = result.rows;
     res.json(data);
   } catch (err) {
@@ -266,10 +288,13 @@ app.post(`/api/trip/:tripId`, authMiddleware, async (req, res, next) => {
 });
 
 app.get(
-  `/api/user/:userId/trip/:tripId/event/:eventId`,
+  `/api/trip/:tripId/event/:eventId`,
+  authMiddleware,
   async (req, res, next) => {
+    const userId = validateLoggedIn(req.user);
     try {
-      const { userId, tripId, eventId } = req.params;
+      const { tripId, eventId } = req.params;
+      validateParam([tripId, eventId]);
       const sql = `
           select  "t".*,
                   "e"."eventId",
@@ -289,11 +314,14 @@ app.get(
     `;
       const params = [userId, tripId, eventId];
       const result = await db.query(sql, params);
-      const data = result.rows;
+      const data = result.rows[0];
       if (data) {
         res.status(200).json(data);
       } else {
-        throw new ClientError(404, `Cannot find trip`);
+        throw new ClientError(
+          404,
+          `Cannot find trip ID: ${tripId} or event ID: ${eventId}`
+        );
       }
     } catch (err) {
       next(err);
@@ -302,9 +330,11 @@ app.get(
 );
 
 app.put(
-  `/api/user/:userId/trip/:tripId/event/:eventId`,
+  `/api/trip/:tripId/event/:eventId`,
+  authMiddleware,
   async (req, res, next) => {
     try {
+      const userId = validateLoggedIn(req.user);
       const {
         tripId,
         eventId,
@@ -319,7 +349,35 @@ app.put(
         lng,
         gPlace,
       } = req.body;
-      const sql = `
+      validateParam([
+        tripId,
+        eventId,
+        eventName,
+        eventDate,
+        startTime,
+        endTime,
+        location,
+        notes,
+        placeId,
+        lat,
+        lng,
+        gPlace,
+      ]);
+
+      // check if user has access to the trip being edited
+      const sql1 = `
+            select "tripId" from "trip" where "userId" = $1 and "tripId" = $2
+      `;
+      const params1 = [userId, tripId];
+      const userCheck = await db.query(sql1, params1);
+      if (!userCheck.rows[0])
+        throw new ClientError(
+          404,
+          `User not permitted to edit trip ID: ${tripId}`
+        );
+
+      // update the event once user is verified to have access
+      const sql2 = `
           update "event"
              set "eventName" = $1,
                  "eventDate" = $2,
@@ -334,7 +392,7 @@ app.put(
           where "tripId" = $11 and "eventId" = $12
           returning *;
     `;
-      const params = [
+      const params2 = [
         eventName,
         eventDate,
         startTime,
@@ -348,7 +406,7 @@ app.put(
         tripId,
         eventId,
       ];
-      const result = await db.query(sql, params);
+      const result = await db.query(sql2, params2);
       const data = result.rows;
       res.json(data);
     } catch (err) {
@@ -358,19 +416,36 @@ app.put(
 );
 
 app.delete(
-  `/api/user/:userId/trip/:tripId/event/:eventId`,
+  `/api/trip/:tripId/event/:eventId`,
+  authMiddleware,
   async (req, res, next) => {
     try {
+      const userId = validateLoggedIn(req.user);
       const tripId = Number(req.params.tripId);
       const eventId = Number(req.params.eventId);
-      const sql = `
+      validateParam([tripId, eventId]);
+
+      // check if user has access to the trip being edited
+      const sql1 = `
+            select "tripId" from "trip" where "userId" = $1 and "tripId" = $2
+      `;
+      const params1 = [userId, tripId];
+      const userCheck = await db.query(sql1, params1);
+      if (!userCheck.rows[0])
+        throw new ClientError(
+          404,
+          `User not permitted to edit trip ID: ${tripId}`
+        );
+
+      // delete the event once user is verified to have access
+      const sql2 = `
           delete
               from "event"
               where "tripId" = $1 and "eventId" = $2
               returning *;
           `;
-      const params = [tripId, eventId];
-      const result = await db.query(sql, params);
+      const params2 = [tripId, eventId];
+      const result = await db.query(sql2, params2);
       const data = result.rows;
       res.json(data);
     } catch (err) {

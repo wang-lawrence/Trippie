@@ -6,7 +6,9 @@ export function validateLoggedIn(user: User | undefined) {
   return user.userId;
 }
 
-export function validateUser(userId: number, authUserId: number): void {
-  if (userId !== authUserId)
-    throw new ClientError(401, 'user not permitted to access data');
+export function validateParam([...params]): void {
+  [...params].map((param) => {
+    if (!param) throw new ClientError(400, 'Missing required fields');
+    return null;
+  });
 }

@@ -1,5 +1,4 @@
-import { FormEvent, useState, useEffect, useContext } from 'react';
-import UserContext from '../components/UserContext';
+import { FormEvent, useState, useEffect } from 'react';
 import { Label } from '../components/ui/label';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
@@ -32,7 +31,6 @@ type PlaceFields = {
 
 export default function EventEntryForm() {
   let { tripId, eventId, startDate, endDate } = useParams();
-  const { user } = useContext(UserContext);
   const [eventName, setEventName] = useState('');
   const [eventDate, setEventDate] = useState('');
   const [startTime, setStartTime] = useState('');
@@ -50,8 +48,8 @@ export default function EventEntryForm() {
   useEffect(() => {
     async function readEvent() {
       try {
-        const [{ eventName, eventDate, startTime, endTime, notes, gPlace }] =
-          await fetchEvent(1, Number(tripId), Number(eventId));
+        const { eventName, eventDate, startTime, endTime, notes, gPlace } =
+          await fetchEvent(Number(tripId), Number(eventId));
         setEventName(eventName);
         const eventDateFormatted = DateTime.fromISO(
           new Date(eventDate).toISOString()
@@ -72,7 +70,6 @@ export default function EventEntryForm() {
     if (edit) readEvent();
   }, [eventId, tripId, edit]);
 
-  console.log(user);
   if (startDate && endDate) {
     const startDateLuxon = DateTime.fromISO(new Date(startDate).toISOString());
     const endDateLuxon = DateTime.fromISO(new Date(endDate).toISOString());
@@ -127,7 +124,6 @@ export default function EventEntryForm() {
     const { name, geometry, place_id } = placeDetail as PlaceFields;
 
     const newEventEntry = {
-      userId: user?.userId,
       tripId: Number(tripId),
       eventName,
       eventDate: new Date(eventDate),
