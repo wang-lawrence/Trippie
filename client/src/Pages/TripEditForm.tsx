@@ -67,7 +67,7 @@ export default function TripEditForm({ editTrip }: Props) {
     } catch (error) {
       setError(error);
     } finally {
-      navigate(`/trip-details/${tripId}`);
+      navigate(`/saved-trips/trip-details/${tripId}`);
     }
   }
 

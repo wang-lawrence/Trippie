@@ -3,26 +3,33 @@ import UserContext from '../components/UserContext';
 import { fetchAllTrips, TripEntry } from '../lib/data';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
+import LoadingSkeleton from '../components/LoadingSkeleton';
 import RedirectLogIn from './RedirectLogIn';
 
 export default function SavedTrips() {
   const [trips, setTrips] = useState<TripEntry[]>([]);
   const [error, setError] = useState<unknown>();
+  const [isLoading, setIsLoading] = useState(false);
   const { user } = useContext(UserContext);
 
   useEffect(() => {
-    async function readTrips(userId: number): Promise<void> {
+    async function readTrips(): Promise<void> {
       try {
+        setIsLoading(true);
         const userTrips = await fetchAllTrips();
         setTrips(userTrips);
       } catch (error) {
         setError(error);
+      } finally {
+        setIsLoading(false);
       }
     }
-    readTrips(1);
+    readTrips();
   }, []);
 
   if (!user) return <RedirectLogIn />;
+
+  if (isLoading) return <LoadingSkeleton />;
 
   if (error) {
     return (

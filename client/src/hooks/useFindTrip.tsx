@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { TripEvents, fetchTrip, placeholder } from '../lib/data';
+import { TripEvents, fetchTrip } from '../lib/data';
 
 type FindTripState = {
-  trip?: TripEvents[];
+  trip: TripEvents[] | undefined;
   isLoading: boolean;
   error: unknown;
 };
@@ -11,7 +11,7 @@ export default function useFindTrip(
   tripId: number,
   deletedId: number
 ): FindTripState {
-  const [trip, setTrip] = useState<TripEvents[]>([placeholder]);
+  const [trip, setTrip] = useState<TripEvents[]>();
   const [error, setError] = useState<unknown>();
 
   useEffect(() => {

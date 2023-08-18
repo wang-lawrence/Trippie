@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from '../components/ui/select';
 import { Button } from '../components/ui/button';
+import LoadingSkeleton from '../components/LoadingSkeleton';
 import PlaceSearch from '../components/PlaceSearch';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { GPlace } from '../components/PlaceSearch';
@@ -38,6 +39,7 @@ export default function EventEntryForm() {
   const [searchResult, setSearchResult] = useState<GPlace>();
   const [notes, setNotes] = useState('');
   const [placeDetail, setPlaceDetail] = useState<PlaceFields>();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [error, setError] = useState<unknown>();
   const navigate = useNavigate();
@@ -48,6 +50,7 @@ export default function EventEntryForm() {
   useEffect(() => {
     async function readEvent() {
       try {
+        setIsLoading(true);
         const { eventName, eventDate, startTime, endTime, notes, gPlace } =
           await fetchEvent(Number(tripId), Number(eventId));
         setEventName(eventName);
@@ -65,6 +68,8 @@ export default function EventEntryForm() {
         setPlaceDetail(JSON.parse(gPlace));
       } catch (error) {
         setError(error);
+      } finally {
+        setIsLoading(false);
       }
     }
     if (edit) readEvent();
@@ -158,11 +163,10 @@ export default function EventEntryForm() {
       navigate(`/saved-trips/trip-details/${tripId}`);
     } catch (error) {
       setError(error);
-    } finally {
     }
   }
 
-  // if (error) return <h1>{`Fetch Error: ${error.message}`}</h1>;
+  if (isLoading) return <LoadingSkeleton />;
 
   return (
     <div className="container max-w-2xl bg-white">
