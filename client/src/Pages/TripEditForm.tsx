@@ -44,7 +44,7 @@ type Props = {
 };
 
 export default function TripEditForm({ editTrip }: Props) {
-  const [error, setError] = useState<Error>();
+  const [error, setError] = useState<unknown>();
   const navigate = useNavigate();
   const { tripId, tripName, startDate, endDate, iconUrl } = editTrip;
 
@@ -65,13 +65,16 @@ export default function TripEditForm({ editTrip }: Props) {
     try {
       await updateTrip({ ...data, tripId: Number(tripId), iconUrl });
     } catch (error) {
-      setError(error as Error);
+      setError(error);
     } finally {
       navigate(`/trip-details/${tripId}`);
     }
   }
 
-  if (error) return <h1>{`Fetch Error: ${error.message}`}</h1>;
+  if (error)
+    return (
+      <h1>{`${error instanceof Error ? error.message : 'Unknwon Error'}`}</h1>
+    );
 
   // form code from shadcn component library
   return (

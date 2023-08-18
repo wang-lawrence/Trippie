@@ -18,16 +18,16 @@ type TripProps = {
 
 export default function TripDetails({ onClick }: TripProps) {
   const [activeIcon, setActiveIcon] = useState('');
-  const [err, setError] = useState<Error>();
-  const [activeMapDays, setactiveMapDays] = useState<number[]>([0]);
+  const [err, setError] = useState<unknown>();
+  const [activeMapDays, setActiveMapDays] = useState<number[]>([0]);
   const [showMap, setShowMap] = useState(false);
   const [deletedId, setDeletedId] = useState(0);
   const { tripId } = useParams();
   const navigate = useNavigate();
-  const { trip, error, isLoading } = useFindTrip(1, Number(tripId), deletedId);
+  const { trip, error, isLoading } = useFindTrip(Number(tripId), deletedId);
 
   useEffect(() => {
-    if (trip) setActiveIcon(trip[0].iconUrl);
+    if (trip?.[0]) setActiveIcon(trip[0].iconUrl);
     if (error) setError(error);
   }, [trip, error]);
 
@@ -35,7 +35,7 @@ export default function TripDetails({ onClick }: TripProps) {
     return <h1>Temporary Loading Page...</h1>;
   }
   if (err || !trip) {
-    return <h1>{err?.message}</h1>;
+    return <h1>{err instanceof Error ? err.message : 'Unknown Error'}</h1>;
   }
 
   function showMapDay(i: number) {
@@ -46,7 +46,7 @@ export default function TripDetails({ onClick }: TripProps) {
     } else {
       selDays.add(i);
     }
-    setactiveMapDays(Array.from(selDays) as number[]);
+    setActiveMapDays(Array.from(selDays) as number[]);
   }
 
   async function handleIconChange(icon: string) {
@@ -60,7 +60,7 @@ export default function TripDetails({ onClick }: TripProps) {
           iconUrl: icon,
         });
       } catch (error) {
-        setError(error as Error);
+        setError(error);
       }
     }
   }
@@ -154,7 +154,7 @@ export default function TripDetails({ onClick }: TripProps) {
             <DaysTab
               activeMapDays={activeMapDays}
               daysCount={daysCount}
-              showMapDay={showMapDay}
+              toggleMapDay={showMapDay}
             />
             <Map
               trip={trip}

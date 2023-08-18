@@ -43,7 +43,7 @@ const FormSchema = z.object({
 type TripFormValues = z.infer<typeof FormSchema>;
 
 export default function TripEntryForm() {
-  const [error, setError] = useState<Error>();
+  const [error, setError] = useState<unknown>();
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
 
@@ -67,7 +67,7 @@ export default function TripEntryForm() {
 
       await addTrip({ ...data, userId: 1, iconUrl });
     } catch (error) {
-      setError(error as Error);
+      setError(error);
     } finally {
       navigate('/saved-trips');
     }
@@ -75,7 +75,10 @@ export default function TripEntryForm() {
 
   if (!user) return <RedirectLogIn />;
 
-  if (error) return <h1>{`Fetch error ${error.message}`}</h1>;
+  if (error)
+    return (
+      <h1>{`${error instanceof Error ? error.message : 'Unknown Error'}`}</h1>
+    );
 
   return (
     <div className="bg-img">

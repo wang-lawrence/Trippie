@@ -39,7 +39,7 @@ export default function EventEntryForm() {
   const [notes, setNotes] = useState('');
   const [placeDetail, setPlaceDetail] = useState<PlaceFields>();
 
-  const [error, setError] = useState<Error>();
+  const [error, setError] = useState<unknown>();
   const navigate = useNavigate();
 
   const edit = eventId !== '0'; // 0 indicates new event
@@ -64,7 +64,7 @@ export default function EventEntryForm() {
         setNotes(notes);
         setPlaceDetail(JSON.parse(gPlace));
       } catch (error) {
-        setError(error as Error);
+        setError(error);
       }
     }
     if (edit) readEvent();
@@ -157,7 +157,7 @@ export default function EventEntryForm() {
       }
       navigate(`/saved-trips/trip-details/${tripId}`);
     } catch (error) {
-      setError(error as Error);
+      setError(error);
     } finally {
     }
   }
@@ -237,8 +237,10 @@ export default function EventEntryForm() {
           </Button>
         </div>
       </form>
-      {error && (
-        <h1 className="mt-4 text-center text-red-600 text-sm">{`${error.message}`}</h1>
+      {error !== undefined && (
+        <h1 className="mt-4 text-center text-red-600 text-sm">{`${
+          error instanceof Error ? error.message : 'Unknown Error'
+        }`}</h1>
       )}
     </div>
   );

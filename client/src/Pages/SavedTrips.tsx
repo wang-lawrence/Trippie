@@ -16,7 +16,7 @@ export default function SavedTrips() {
         const userTrips = await fetchAllTrips();
         setTrips(userTrips);
       } catch (error) {
-        setError(error as Error);
+        setError(error);
       }
     }
     readTrips(1);
@@ -24,12 +24,11 @@ export default function SavedTrips() {
 
   if (!user) return <RedirectLogIn />;
 
-  if (error)
+  if (error) {
     return (
-      <h1>{`Fetch error: ${
-        error instanceof Error ? error.message : 'Unknown Error'
-      }`}</h1>
+      <h1>{`${error instanceof Error ? error.message : 'Unknown Error'}`}</h1>
     );
+  }
 
   return (
     <div className="container bg-white">
