@@ -7,7 +7,7 @@ import RedirectLogIn from './RedirectLogIn';
 
 export default function SavedTrips() {
   const [trips, setTrips] = useState<TripEntry[]>([]);
-  const [error, setError] = useState<Error>();
+  const [error, setError] = useState<unknown>();
   const { user } = useContext(UserContext);
 
   useEffect(() => {
@@ -24,7 +24,12 @@ export default function SavedTrips() {
 
   if (!user) return <RedirectLogIn />;
 
-  if (error) return <h1>{`Fetch error: ${error.message}`}</h1>;
+  if (error)
+    return (
+      <h1>{`Fetch error: ${
+        error instanceof Error ? error.message : 'Unknown Error'
+      }`}</h1>
+    );
 
   return (
     <div className="container bg-white">

@@ -80,7 +80,7 @@ export default function TripEntryForm() {
   return (
     <div className="bg-img">
       <div className="container">
-        <div className="mt-10 lg:mt-14">
+        <div className="mt-6 lg:mt-10">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
@@ -89,7 +89,7 @@ export default function TripEntryForm() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex justify-center">
-                      <FormLabel className="roboto md:text-xl">
+                      <FormLabel className="roboto text-lg md:text-xl">
                         Trip Name
                       </FormLabel>
                     </div>
@@ -114,7 +114,7 @@ export default function TripEntryForm() {
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <div className="flex justify-center">
-                      <FormLabel className="roboto md:text-xl">
+                      <FormLabel className="roboto text-lg md:text-xl">
                         Start Date
                       </FormLabel>
                     </div>
@@ -166,7 +166,7 @@ export default function TripEntryForm() {
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <div className="flex justify-center">
-                      <FormLabel className="robot md:text-xl">
+                      <FormLabel className="robot text-lg md:text-xl">
                         End Date
                       </FormLabel>
                     </div>

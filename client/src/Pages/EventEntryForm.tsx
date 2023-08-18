@@ -103,60 +103,66 @@ export default function EventEntryForm() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-
-    const timeZoneHourOffset =
-      (DateTime.fromISO(eventDate).toUTC().day -
-        DateTime.fromISO(eventDate).day) *
-        24 +
-      (DateTime.fromISO(eventDate).toUTC().hour -
-        DateTime.fromISO(eventDate).hour);
-
-    const startTimeHrMin = {
-      hour: DateTime.fromISO(startTime).hour + timeZoneHourOffset,
-      minute: DateTime.fromISO(startTime).minute,
-    };
-
-    const endTimeHrMin = {
-      hour: DateTime.fromISO(endTime).hour + timeZoneHourOffset,
-      minute: DateTime.fromISO(endTime).minute,
-    };
-
-    const { name, geometry, place_id } = placeDetail as PlaceFields;
-
-    const newEventEntry = {
-      tripId: Number(tripId),
-      eventName,
-      eventDate: new Date(eventDate),
-      startTime: DateTime.fromISO(eventDate)
-        .set(startTimeHrMin)
-        .toISO() as string,
-      endTime: DateTime.fromISO(eventDate).set(endTimeHrMin).toISO() as string,
-      location: name,
-      notes,
-      placeId: place_id,
-      lat: isNaN(Number(geometry.location.lat))
-        ? geometry.location?.lat()
-        : Number(geometry.location.lat),
-      lng: isNaN(Number(geometry.location.lng))
-        ? geometry.location?.lng()
-        : Number(geometry.location.lng),
-      gPlace: JSON.stringify(placeDetail),
-    };
-
     try {
+      if (!eventName || !eventDate || !startTime || !endTime || !placeDetail) {
+        throw new Error(
+          'Please complete all fields. Location must be selected from one of the search options'
+        );
+      }
+      const timeZoneHourOffset =
+        (DateTime.fromISO(eventDate).toUTC().day -
+          DateTime.fromISO(eventDate).day) *
+          24 +
+        (DateTime.fromISO(eventDate).toUTC().hour -
+          DateTime.fromISO(eventDate).hour);
+
+      const startTimeHrMin = {
+        hour: DateTime.fromISO(startTime).hour + timeZoneHourOffset,
+        minute: DateTime.fromISO(startTime).minute,
+      };
+
+      const endTimeHrMin = {
+        hour: DateTime.fromISO(endTime).hour + timeZoneHourOffset,
+        minute: DateTime.fromISO(endTime).minute,
+      };
+
+      const { name, geometry, place_id } = placeDetail as PlaceFields;
+
+      const newEventEntry = {
+        tripId: Number(tripId),
+        eventName,
+        eventDate: new Date(eventDate),
+        startTime: DateTime.fromISO(eventDate)
+          .set(startTimeHrMin)
+          .toISO() as string,
+        endTime: DateTime.fromISO(eventDate)
+          .set(endTimeHrMin)
+          .toISO() as string,
+        location: name,
+        notes,
+        placeId: place_id,
+        lat: isNaN(Number(geometry.location.lat)) //the strigified placeDetail makes lat a number and doesn't keep the function, so use ternary to pick which lat/lat() to use
+          ? geometry.location?.lat()
+          : Number(geometry.location.lat),
+        lng: isNaN(Number(geometry.location.lng))
+          ? geometry.location?.lng()
+          : Number(geometry.location.lng),
+        gPlace: JSON.stringify(placeDetail),
+      };
+
       if (edit) {
         await updateEvent({ ...newEventEntry, eventId: Number(eventId) });
       } else {
         await addEvent(newEventEntry);
       }
+      navigate(`/saved-trips/trip-details/${tripId}`);
     } catch (error) {
       setError(error as Error);
     } finally {
-      navigate(`/saved-trips/trip-details/${tripId}`);
     }
   }
 
-  if (error) return <h1>{`Fetch Error: ${error.message}`}</h1>;
+  // if (error) return <h1>{`Fetch Error: ${error.message}`}</h1>;
 
   return (
     <div className="container max-w-2xl bg-white">
@@ -224,13 +230,16 @@ export default function EventEntryForm() {
             </Button>
           </Link>
           <Button
-            type="submit"
+            type="button"
             onClick={(e) => handleSubmit(e)}
             className="roboto w-28 bg-gold text-lg mt-1">
             Submit
           </Button>
         </div>
       </form>
+      {error && (
+        <h1 className="mt-4 text-center text-red-600 text-sm">{`${error.message}`}</h1>
+      )}
     </div>
   );
 }

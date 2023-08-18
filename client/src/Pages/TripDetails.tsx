@@ -124,7 +124,7 @@ export default function TripDetails({ onClick }: TripProps) {
         </Link>
         <Button
           onClick={() => setShowMap(!showMap)}
-          className="bg-gold w-1/3 max-w-[120px] mx-7">
+          className="bg-gold w-1/3 max-w-[120px] mx-2 sm:mx-7">
           Map <FaMapLocationDot className="ml-2" />
         </Button>
         <Modal onContClick={handleDeleteTrip} deleteName={tripName}>
