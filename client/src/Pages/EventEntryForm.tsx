@@ -152,7 +152,7 @@ export default function EventEntryForm() {
     } catch (error) {
       setError(error as Error);
     } finally {
-      navigate(`/trip-details/${tripId}`);
+      navigate(`/saved-trips/trip-details/${tripId}`);
     }
   }
 
@@ -216,7 +216,7 @@ export default function EventEntryForm() {
           className="mb-3"
         />
         <div className="flex justify-center">
-          <Link to={`/trip-details/${tripId}`}>
+          <Link to={`/saved-trips/trip-details/${tripId}`}>
             <Button
               type="button"
               className="roboto w-28 bg-gold text-lg mt-1 mr-2">

@@ -1,4 +1,4 @@
-import { Link, Outlet } from 'react-router-dom';
+import { Link, NavLink, Outlet } from 'react-router-dom';
 import { useContext } from 'react';
 import UserContext from './UserContext';
 
@@ -12,20 +12,22 @@ export default function NavBar() {
             <Link to="/" className="sansita text-3xl">
               Trippie
             </Link>
-            <Link to="/trip-form" className="roboto pl-5 text-md font-light">
+            <NavLink to="/trip-form" className="roboto pl-5 text-md font-light">
               New Trip
-            </Link>
-            <Link to="/saved-trips" className="roboto pl-5 text-md font-light">
+            </NavLink>
+            <NavLink
+              to="/saved-trips"
+              className="roboto pl-5 text-md font-light">
               Saved Trips
-            </Link>
+            </NavLink>
             {user ? (
-              <Link to="/sign-in" className="roboto pl-5 text-md font-light">
+              <NavLink to="/sign-in" className="roboto pl-5 text-md font-light">
                 <span onClick={handleSignOut}>Log Out</span>
-              </Link>
+              </NavLink>
             ) : (
-              <Link to="/sign-in" className="roboto pl-5 text-md font-light">
+              <NavLink to="/sign-in" className="roboto pl-5 text-md font-light">
                 Sign In/Up
-              </Link>
+              </NavLink>
             )}
           </nav>
         </div>

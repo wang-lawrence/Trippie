@@ -210,7 +210,7 @@ export default function TripEditForm({ editTrip }: Props) {
                 )}
               />
               <div className="flex justify-center">
-                <Link to={`/trip-details/${tripId}`}>
+                <Link to={`/saved-trips/trip-details/${tripId}`}>
                   <Button
                     type="button"
                     className="roboto w-28 bg-gold text-lg mr-4">

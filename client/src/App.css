@@ -52,3 +52,7 @@ body {
 .overflow-scroll::-webkit-scrollbar {
   display: none;
 }
+
+.active {
+  font-weight: bold;
+}
