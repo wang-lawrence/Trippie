@@ -10,12 +10,12 @@ body {
 .container {
   padding: 1.5rem;
   max-width: 1200px;
-  min-height: 100vh;
+  min-height: calc(100vh - 48px);
 }
 
 .map-container {
   width: 95%;
-  height: 90%;
+  height: 50vh;
   border-radius: 5px;
 }
 
@@ -33,8 +33,22 @@ body {
   background-position-x: center;
   background-position-y: center;
   overflow: hidden;
-  height: calc(100vh - 51px);
+  height: calc(100vh - 48px);
   width: 100%;
+}
+
+@media (width >= 640px) {
+  .container {
+    min-height: calc(100vh - 53px);
+  }
+
+  .bg-img {
+    height: calc(100vh - 53px);
+  }
+
+  .map-container {
+    height: 100%;
+  }
 }
 
 .bg-gold {
@@ -51,4 +65,65 @@ body {
 
 .overflow-scroll::-webkit-scrollbar {
   display: none;
+}
+
+.active {
+  font-weight: 500;
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  position: relative;
+  animation: rotate 1s linear infinite;
+}
+
+.loader::before,
+.loader::after {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 5px solid #e8aa42;
+  animation: prixClipFix 2s linear infinite;
+}
+
+.loader::after {
+  border-color: #e57c23;
+  animation: prixClipFix 2s linear infinite, rotate 0.5s linear infinite reverse;
+  inset: 6px;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes prixClipFix {
+  0% {
+    clip-path: polygon(50% 50%, 0 0, 0 0, 0 0, 0 0, 0 0);
+  }
+
+  25% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 0, 100% 0, 100% 0);
+  }
+
+  50% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 100% 100%, 100% 100%);
+  }
+
+  75% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 100%);
+  }
+
+  100% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 0);
+  }
 }

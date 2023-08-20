@@ -3,28 +3,39 @@ import UserContext from '../components/UserContext';
 import { fetchAllTrips, TripEntry } from '../lib/data';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
+import LoadingSkeleton from '../components/LoadingSkeleton';
 import RedirectLogIn from './RedirectLogIn';
 
 export default function SavedTrips() {
   const [trips, setTrips] = useState<TripEntry[]>([]);
-  const [error, setError] = useState<Error>();
+  const [error, setError] = useState<unknown>();
+  const [isLoading, setIsLoading] = useState(false);
   const { user } = useContext(UserContext);
 
   useEffect(() => {
-    async function readTrips(userId: number): Promise<void> {
+    async function readTrips(): Promise<void> {
       try {
+        setIsLoading(true);
         const userTrips = await fetchAllTrips();
         setTrips(userTrips);
       } catch (error) {
-        setError(error as Error);
+        setError(error);
+      } finally {
+        setIsLoading(false);
       }
     }
-    readTrips(1);
+    readTrips();
   }, []);
 
   if (!user) return <RedirectLogIn />;
 
-  if (error) return <h1>{`Fetch error: ${error.message}`}</h1>;
+  if (isLoading) return <LoadingSkeleton />;
+
+  if (error) {
+    return (
+      <h1>{`${error instanceof Error ? error.message : 'Unknown Error'}`}</h1>
+    );
+  }
 
   return (
     <div className="container bg-white">
@@ -54,7 +65,7 @@ function TripCard({
   iconUrl,
 }: Partial<TripEntry>) {
   return (
-    <Link to={`/trip-details/${tripId}`}>
+    <Link to={`trip-details/${tripId}`}>
       <div className="h-24 w-full px-5 mt-4 bg-[#F8F1F1] flex items-center rounded-md border border-gray-200 shadow cursor-pointer hover:shadow-md hover:outline hover:outline-slate-200">
         <div className="h-16 w-16 p-2 rounded-full border border-gray-200 bg-white shadow">
           <img src={iconUrl} alt="travel icon" />

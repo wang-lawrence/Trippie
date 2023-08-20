@@ -1,4 +1,3 @@
-import { useMemo, useEffect, useState } from 'react';
 import { GoogleMap, useLoadScript, MarkerF } from '@react-google-maps/api';
 import { TripEvents, pinColors } from '../lib/data';
 import { DateTime } from 'luxon';
@@ -10,8 +9,6 @@ type MapProps = {
 };
 
 export default function Map({ trip, activeMapDays, startDate }: MapProps) {
-  // const center = useMemo(() => ({ lat: 37, lng: -119 }), []); incorporate useMemo later so map doesn't recenter after rerender
-
   const latPlaces: number[] = [];
   const lngPlaces: number[] = [];
 

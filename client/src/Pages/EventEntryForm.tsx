@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from '../components/ui/select';
 import { Button } from '../components/ui/button';
+import LoadingSkeleton from '../components/LoadingSkeleton';
 import PlaceSearch from '../components/PlaceSearch';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { GPlace } from '../components/PlaceSearch';
@@ -38,8 +39,9 @@ export default function EventEntryForm() {
   const [searchResult, setSearchResult] = useState<GPlace>();
   const [notes, setNotes] = useState('');
   const [placeDetail, setPlaceDetail] = useState<PlaceFields>();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [error, setError] = useState<Error>();
+  const [error, setError] = useState<unknown>();
   const navigate = useNavigate();
 
   const edit = eventId !== '0'; // 0 indicates new event
@@ -48,6 +50,7 @@ export default function EventEntryForm() {
   useEffect(() => {
     async function readEvent() {
       try {
+        setIsLoading(true);
         const { eventName, eventDate, startTime, endTime, notes, gPlace } =
           await fetchEvent(Number(tripId), Number(eventId));
         setEventName(eventName);
@@ -64,7 +67,9 @@ export default function EventEntryForm() {
         setNotes(notes);
         setPlaceDetail(JSON.parse(gPlace));
       } catch (error) {
-        setError(error as Error);
+        setError(error);
+      } finally {
+        setIsLoading(false);
       }
     }
     if (edit) readEvent();
@@ -103,60 +108,65 @@ export default function EventEntryForm() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-
-    const timeZoneHourOffset =
-      (DateTime.fromISO(eventDate).toUTC().day -
-        DateTime.fromISO(eventDate).day) *
-        24 +
-      (DateTime.fromISO(eventDate).toUTC().hour -
-        DateTime.fromISO(eventDate).hour);
-
-    const startTimeHrMin = {
-      hour: DateTime.fromISO(startTime).hour + timeZoneHourOffset,
-      minute: DateTime.fromISO(startTime).minute,
-    };
-
-    const endTimeHrMin = {
-      hour: DateTime.fromISO(endTime).hour + timeZoneHourOffset,
-      minute: DateTime.fromISO(endTime).minute,
-    };
-
-    const { name, geometry, place_id } = placeDetail as PlaceFields;
-
-    const newEventEntry = {
-      tripId: Number(tripId),
-      eventName,
-      eventDate: new Date(eventDate),
-      startTime: DateTime.fromISO(eventDate)
-        .set(startTimeHrMin)
-        .toISO() as string,
-      endTime: DateTime.fromISO(eventDate).set(endTimeHrMin).toISO() as string,
-      location: name,
-      notes,
-      placeId: place_id,
-      lat: isNaN(Number(geometry.location.lat))
-        ? geometry.location?.lat()
-        : Number(geometry.location.lat),
-      lng: isNaN(Number(geometry.location.lng))
-        ? geometry.location?.lng()
-        : Number(geometry.location.lng),
-      gPlace: JSON.stringify(placeDetail),
-    };
-
     try {
+      if (!eventName || !eventDate || !startTime || !endTime || !placeDetail) {
+        throw new Error(
+          'Please complete all fields. Location must be selected from one of the search options'
+        );
+      }
+      const timeZoneHourOffset =
+        (DateTime.fromISO(eventDate).toUTC().day -
+          DateTime.fromISO(eventDate).day) *
+          24 +
+        (DateTime.fromISO(eventDate).toUTC().hour -
+          DateTime.fromISO(eventDate).hour);
+
+      const startTimeHrMin = {
+        hour: DateTime.fromISO(startTime).hour + timeZoneHourOffset,
+        minute: DateTime.fromISO(startTime).minute,
+      };
+
+      const endTimeHrMin = {
+        hour: DateTime.fromISO(endTime).hour + timeZoneHourOffset,
+        minute: DateTime.fromISO(endTime).minute,
+      };
+
+      const { name, geometry, place_id } = placeDetail as PlaceFields;
+
+      const newEventEntry = {
+        tripId: Number(tripId),
+        eventName,
+        eventDate: new Date(eventDate),
+        startTime: DateTime.fromISO(eventDate)
+          .set(startTimeHrMin)
+          .toISO() as string,
+        endTime: DateTime.fromISO(eventDate)
+          .set(endTimeHrMin)
+          .toISO() as string,
+        location: name,
+        notes,
+        placeId: place_id,
+        lat: isNaN(Number(geometry.location.lat)) //the strigified placeDetail makes lat a number and doesn't keep the function, so use ternary to pick which lat/lat() to use
+          ? geometry.location?.lat()
+          : Number(geometry.location.lat),
+        lng: isNaN(Number(geometry.location.lng))
+          ? geometry.location?.lng()
+          : Number(geometry.location.lng),
+        gPlace: JSON.stringify(placeDetail),
+      };
+
       if (edit) {
         await updateEvent({ ...newEventEntry, eventId: Number(eventId) });
       } else {
         await addEvent(newEventEntry);
       }
+      navigate(`/saved-trips/trip-details/${tripId}`);
     } catch (error) {
-      setError(error as Error);
-    } finally {
-      navigate(`/trip-details/${tripId}`);
+      setError(error);
     }
   }
 
-  if (error) return <h1>{`Fetch Error: ${error.message}`}</h1>;
+  if (isLoading) return <LoadingSkeleton />;
 
   return (
     <div className="container max-w-2xl bg-white">
@@ -216,7 +226,7 @@ export default function EventEntryForm() {
           className="mb-3"
         />
         <div className="flex justify-center">
-          <Link to={`/trip-details/${tripId}`}>
+          <Link to={`/saved-trips/trip-details/${tripId}`}>
             <Button
               type="button"
               className="roboto w-28 bg-gold text-lg mt-1 mr-2">
@@ -224,13 +234,18 @@ export default function EventEntryForm() {
             </Button>
           </Link>
           <Button
-            type="submit"
+            type="button"
             onClick={(e) => handleSubmit(e)}
             className="roboto w-28 bg-gold text-lg mt-1">
             Submit
           </Button>
         </div>
       </form>
+      {error !== undefined && (
+        <h1 className="mt-4 text-center text-red-600 text-sm">{`${
+          error instanceof Error ? error.message : 'Unknown Error'
+        }`}</h1>
+      )}
     </div>
   );
 }

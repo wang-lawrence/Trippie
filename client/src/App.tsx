@@ -36,7 +36,7 @@ function App() {
 
   function handleEditTripSubmit(trip: TripEntry) {
     setEditTrip(trip);
-    navigate(`trip-form/${trip.tripId}`);
+    navigate(`saved-trips/trip-form/${trip.tripId}`);
   }
   return (
     <div>
@@ -47,16 +47,16 @@ function App() {
             <Route index element={<TripEntryForm />} />
             <Route path="trip-form" element={<TripEntryForm />} />
             <Route
-              path="trip-form/:tripId"
+              path="saved-trips/trip-form/:tripId"
               element={<TripEditForm editTrip={editTrip} />}
             />
             <Route path="saved-trips" element={<SavedTrips />} />
             <Route
-              path="trip-details/:tripId"
+              path="saved-trips/trip-details/:tripId"
               element={<TripDetails onClick={handleEditTripSubmit} />}
             />
             <Route
-              path="trip-details/:tripId/event-form/start/:startDate/end/:endDate/:eventId"
+              path="saved-trips/trip-details/:tripId/event-form/start/:startDate/end/:endDate/:eventId"
               element={<EventEntryForm />}
             />
             <Route path="sign-up" element={<AuthPage action="sign-up" />} />

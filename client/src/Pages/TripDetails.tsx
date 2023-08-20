@@ -5,6 +5,8 @@ import Map from '../components/Map';
 import DaysTab from '../components/DaysTab';
 import EventCards from '../components/EventCards';
 import IconPopover from '../components/IconPopover';
+import LoadingSkeleton from '../components/LoadingSkeleton';
+import LoadingSpinner from '../components/LoadingSpinner';
 import { AiOutlinePlusCircle, AiOutlineMinusCircle } from 'react-icons/ai';
 import { FaMapLocationDot } from 'react-icons/fa6';
 import { useParams, useNavigate, Link } from 'react-router-dom';
@@ -18,24 +20,32 @@ type TripProps = {
 
 export default function TripDetails({ onClick }: TripProps) {
   const [activeIcon, setActiveIcon] = useState('');
-  const [err, setError] = useState<Error>();
-  const [activeMapDays, setactiveMapDays] = useState<number[]>([0]);
+  const [err, setError] = useState<unknown>();
+  const [activeMapDays, setActiveMapDays] = useState<number[]>([0]);
   const [showMap, setShowMap] = useState(false);
   const [deletedId, setDeletedId] = useState(0);
+  const [isMapLoading, setIsMapLoading] = useState(false);
   const { tripId } = useParams();
   const navigate = useNavigate();
-  const { trip, error, isLoading } = useFindTrip(1, Number(tripId), deletedId);
+  const { trip, error, isLoading } = useFindTrip(Number(tripId), deletedId);
 
   useEffect(() => {
-    if (trip) setActiveIcon(trip[0].iconUrl);
+    if (trip?.[0]) setActiveIcon(trip[0].iconUrl);
     if (error) setError(error);
   }, [trip, error]);
 
   if (isLoading) {
-    return <h1>Temporary Loading Page...</h1>;
+    return (
+      <div className="container bg-white flex justify-center">
+        <div className="pt-32">
+          <LoadingSpinner />
+        </div>
+      </div>
+    );
   }
+
   if (err || !trip) {
-    return <h1>{err?.message}</h1>;
+    return <h1>{err instanceof Error ? err.message : 'Unknown Error'}</h1>;
   }
 
   function showMapDay(i: number) {
@@ -46,7 +56,7 @@ export default function TripDetails({ onClick }: TripProps) {
     } else {
       selDays.add(i);
     }
-    setactiveMapDays(Array.from(selDays) as number[]);
+    setActiveMapDays(Array.from(selDays) as number[]);
   }
 
   async function handleIconChange(icon: string) {
@@ -60,7 +70,7 @@ export default function TripDetails({ onClick }: TripProps) {
           iconUrl: icon,
         });
       } catch (error) {
-        setError(error as Error);
+        setError(error);
       }
     }
   }
@@ -79,11 +89,16 @@ export default function TripDetails({ onClick }: TripProps) {
     try {
       await deleteEvent(Number(tripId), eventId);
       setDeletedId(eventId);
-      setShowMap(!showMap);
-      setTimeout(() => setShowMap(showMap), 650);
+      if (showMap) {
+        setShowMap(!showMap);
+        setIsMapLoading(true);
+        setTimeout(() => {
+          setShowMap(showMap);
+          setIsMapLoading(false);
+        }, 700);
+      }
     } catch (error) {
       setError(error as Error);
-    } finally {
     }
   }
 
@@ -102,7 +117,7 @@ export default function TripDetails({ onClick }: TripProps) {
   };
 
   return (
-    <div className="container roboto bg-white">
+    <div className="container roboto bg-white flex flex-col">
       <header className="flex justify-center content-center">
         <div
           onClick={() => onClick(editTrip)}
@@ -124,7 +139,7 @@ export default function TripDetails({ onClick }: TripProps) {
         </Link>
         <Button
           onClick={() => setShowMap(!showMap)}
-          className="bg-gold w-1/3 max-w-[120px] mx-7">
+          className="bg-gold w-1/3 max-w-[120px] mx-2 sm:mx-7">
           Map <FaMapLocationDot className="ml-2" />
         </Button>
         <Modal onContClick={handleDeleteTrip} deleteName={tripName}>
@@ -133,37 +148,42 @@ export default function TripDetails({ onClick }: TripProps) {
           </Button>
         </Modal>
       </section>
-      <div className="flex flex-wrap justify-center h-[80vh]">
-        <section
-          className={`mt-3 px-2 max-w-screen-md overflow-scroll ${
-            showMap
-              ? 'h-1/3 w-full sm:h-full sm:w-1/2'
-              : ' h-full w-full sm:w-3/4'
-          }`}>
-          <EventCards
-            trip={trip}
-            daysCount={daysCount}
-            handleDeleteEvent={handleDeleteEvent}
-          />
-        </section>
-        {showMap && (
+      {isMapLoading && (
+        <div className="mt-3 mx-auto max-w-screen-lg flex justify-center items-center w-full h-[250px]">
+          <LoadingSpinner />
+        </div>
+      )}
+      {!isMapLoading && (
+        <div className="flex flex-wrap justify-center h-full sm:h-[70vh]">
           <section
-            className={`mt-3 max-w-screen-lg  flex justify-center flex-wrap w-full sm:w-1/2 ${
-              showMap && 'h-2/3 sm:h-full'
+            className={`mt-3 px-2 max-w-screen-md overflow-scroll ${
+              showMap
+                ? 'h-[30vh] w-full sm:h-full sm:w-1/2'
+                : ' h-[70vh] w-full sm:w-3/4'
             }`}>
-            <DaysTab
-              activeMapDays={activeMapDays}
-              daysCount={daysCount}
-              showMapDay={showMapDay}
-            />
-            <Map
+            <EventCards
               trip={trip}
-              activeMapDays={activeMapDays}
-              startDate={startDate}
+              daysCount={daysCount}
+              handleDeleteEvent={handleDeleteEvent}
             />
           </section>
-        )}
-      </div>
+          {showMap && (
+            <section
+              className={`mt-3 max-w-screen-lg  flex justify-center flex-wrap w-full sm:w-1/2 h-5/6 sm:h-full}`}>
+              <DaysTab
+                activeMapDays={activeMapDays}
+                daysCount={daysCount}
+                toggleMapDay={showMapDay}
+              />
+              <Map
+                trip={trip}
+                activeMapDays={activeMapDays}
+                startDate={startDate}
+              />
+            </section>
+          )}
+        </div>
+      )}
     </div>
   );
 }

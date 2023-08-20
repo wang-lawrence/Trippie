@@ -1,19 +1,18 @@
 import { useState, useEffect } from 'react';
-import { TripEvents, fetchTrip, placeholder } from '../lib/data';
+import { TripEvents, fetchTrip } from '../lib/data';
 
 type FindTripState = {
-  trip?: TripEvents[];
+  trip: TripEvents[] | undefined;
   isLoading: boolean;
-  error: Error | undefined;
+  error: unknown;
 };
 
 export default function useFindTrip(
-  userId: number,
   tripId: number,
   deletedId: number
 ): FindTripState {
-  const [trip, setTrip] = useState<TripEvents[]>([placeholder]);
-  const [error, setError] = useState<Error | undefined>();
+  const [trip, setTrip] = useState<TripEvents[]>();
+  const [error, setError] = useState<unknown>();
 
   useEffect(() => {
     async function readTrips(): Promise<void> {
@@ -23,12 +22,12 @@ export default function useFindTrip(
           throw new Error('Trip not found');
         }
         setTrip(activeTrip);
-      } catch (err) {
-        setError(err as Error);
+      } catch (error) {
+        setError(error);
       }
     }
     readTrips();
-  }, [userId, tripId, deletedId]);
+  }, [tripId, deletedId]);
 
   return { trip, error, isLoading: !trip && !error };
 }

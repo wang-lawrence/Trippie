@@ -43,7 +43,7 @@ const FormSchema = z.object({
 type TripFormValues = z.infer<typeof FormSchema>;
 
 export default function TripEntryForm() {
-  const [error, setError] = useState<Error>();
+  const [error, setError] = useState<unknown>();
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
 
@@ -67,7 +67,7 @@ export default function TripEntryForm() {
 
       await addTrip({ ...data, userId: 1, iconUrl });
     } catch (error) {
-      setError(error as Error);
+      setError(error);
     } finally {
       navigate('/saved-trips');
     }
@@ -75,12 +75,15 @@ export default function TripEntryForm() {
 
   if (!user) return <RedirectLogIn />;
 
-  if (error) return <h1>{`Fetch error ${error.message}`}</h1>;
+  if (error)
+    return (
+      <h1>{`${error instanceof Error ? error.message : 'Unknown Error'}`}</h1>
+    );
 
   return (
     <div className="bg-img">
       <div className="container">
-        <div className="mt-10 lg:mt-14">
+        <div className="mt-6 lg:mt-10">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
@@ -89,7 +92,7 @@ export default function TripEntryForm() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex justify-center">
-                      <FormLabel className="roboto md:text-xl">
+                      <FormLabel className="roboto text-lg md:text-xl">
                         Trip Name
                       </FormLabel>
                     </div>
@@ -114,7 +117,7 @@ export default function TripEntryForm() {
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <div className="flex justify-center">
-                      <FormLabel className="roboto md:text-xl">
+                      <FormLabel className="roboto text-lg md:text-xl">
                         Start Date
                       </FormLabel>
                     </div>
@@ -166,7 +169,7 @@ export default function TripEntryForm() {
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <div className="flex justify-center">
-                      <FormLabel className="robot md:text-xl">
+                      <FormLabel className="robot text-lg md:text-xl">
                         End Date
                       </FormLabel>
                     </div>

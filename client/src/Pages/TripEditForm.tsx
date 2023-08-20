@@ -44,7 +44,7 @@ type Props = {
 };
 
 export default function TripEditForm({ editTrip }: Props) {
-  const [error, setError] = useState<Error>();
+  const [error, setError] = useState<unknown>();
   const navigate = useNavigate();
   const { tripId, tripName, startDate, endDate, iconUrl } = editTrip;
 
@@ -65,19 +65,22 @@ export default function TripEditForm({ editTrip }: Props) {
     try {
       await updateTrip({ ...data, tripId: Number(tripId), iconUrl });
     } catch (error) {
-      setError(error as Error);
+      setError(error);
     } finally {
-      navigate(`/trip-details/${tripId}`);
+      navigate(`/saved-trips/trip-details/${tripId}`);
     }
   }
 
-  if (error) return <h1>{`Fetch Error: ${error.message}`}</h1>;
+  if (error)
+    return (
+      <h1>{`${error instanceof Error ? error.message : 'Unknwon Error'}`}</h1>
+    );
 
   // form code from shadcn component library
   return (
     <div className="bg-img">
       <div className="container">
-        <div className="mt-10 lg:mt-14">
+        <div className="mt-6 lg:mt-10">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
@@ -86,7 +89,7 @@ export default function TripEditForm({ editTrip }: Props) {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex justify-center">
-                      <FormLabel className="roboto md:text-xl">
+                      <FormLabel className="roboto text-lg md:text-xl">
                         Trip Name
                       </FormLabel>
                     </div>
@@ -111,7 +114,7 @@ export default function TripEditForm({ editTrip }: Props) {
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <div className="flex justify-center">
-                      <FormLabel className="roboto md:text-xl">
+                      <FormLabel className="roboto text-lg md:text-xl">
                         Start Date
                       </FormLabel>
                     </div>
@@ -163,7 +166,7 @@ export default function TripEditForm({ editTrip }: Props) {
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <div className="flex justify-center">
-                      <FormLabel className="robot md:text-xl">
+                      <FormLabel className="robot text-lg md:text-xl">
                         End Date
                       </FormLabel>
                     </div>
@@ -210,7 +213,7 @@ export default function TripEditForm({ editTrip }: Props) {
                 )}
               />
               <div className="flex justify-center">
-                <Link to={`/trip-details/${tripId}`}>
+                <Link to={`/saved-trips/trip-details/${tripId}`}>
                   <Button
                     type="button"
                     className="roboto w-28 bg-gold text-lg mr-4">
