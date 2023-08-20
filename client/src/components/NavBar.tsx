@@ -14,24 +14,26 @@ export default function NavBar() {
             </Link>
             <NavLink
               to="/trip-form"
-              className="roboto pl-5 text-sm sm:text-md font-light">
+              className="roboto pl-3 sm:pl-5 text-sm sm:text-md font-light">
               New Trip
             </NavLink>
             <NavLink
               to="/saved-trips"
-              className="roboto pl-5 text-sm sm:text-md font-light">
+              className="roboto pl-3 sm:pl-5 text-sm sm:text-md font-light">
               Saved Trips
             </NavLink>
             {user ? (
               <NavLink
                 to="/sign-in"
-                className="roboto pl-5 text-sm sm:text-md font-light">
-                <span onClick={handleSignOut}>Log Out</span>
+                className="roboto pl-3 sm:pl-5 text-sm sm:text-md font-light">
+                <span
+                  onClick={handleSignOut}
+                  className="inline-block align-middle sm:w-full truncate">{`Log Out, ${user.firstName}`}</span>
               </NavLink>
             ) : (
               <NavLink
                 to="/sign-in"
-                className="roboto pl-5 text-sm sm:text-md font-light">
+                className="roboto pl-3 sm:pl-5 text-sm sm:text-md font-light">
                 Sign In/Up
               </NavLink>
             )}
