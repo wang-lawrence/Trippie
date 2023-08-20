@@ -11,6 +11,7 @@ import TripDetails from './Pages/TripDetails';
 import TripEditForm from './Pages/TripEditForm';
 import EventEntryForm from './Pages/EventEntryForm';
 import AuthPage from './Pages/AuthPage';
+import HomePage from './Pages/HomePage';
 import NotFound from './Pages/NotFound';
 import { placeholder, TripEntry, TripEvents } from './lib/data';
 
@@ -44,7 +45,7 @@ function App() {
         <Routes>
           <Route path="/" element={<NavBar />}>
             {/*replace with a home page once that's desgined*/}
-            <Route index element={<TripEntryForm />} />
+            <Route index element={<HomePage />} />
             <Route path="trip-form" element={<TripEntryForm />} />
             <Route
               path="saved-trips/trip-form/:tripId"
