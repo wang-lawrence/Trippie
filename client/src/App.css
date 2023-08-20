@@ -37,6 +37,10 @@ body {
   width: 100%;
 }
 
+.truncate {
+  width: calc(100% - 250px);
+}
+
 @media (width >= 640px) {
   .container {
     min-height: calc(100vh - 53px);
@@ -48,6 +52,10 @@ body {
 
   .map-container {
     height: 100%;
+  }
+
+  .truncate {
+    width: calc(100% - 300px);
   }
 }
 
@@ -125,5 +133,25 @@ body {
 
   100% {
     clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 0);
+  }
+}
+
+.intro {
+  animation: 1.2s ease-in fadeUp;
+}
+
+.hp-login {
+  animation: 1s ease-in 1s backwards fadeUp;
+}
+
+@keyframes fadeUp {
+  0% {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
   }
 }

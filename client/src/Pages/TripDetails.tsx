@@ -5,7 +5,6 @@ import Map from '../components/Map';
 import DaysTab from '../components/DaysTab';
 import EventCards from '../components/EventCards';
 import IconPopover from '../components/IconPopover';
-import LoadingSkeleton from '../components/LoadingSkeleton';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { AiOutlinePlusCircle, AiOutlineMinusCircle } from 'react-icons/ai';
 import { FaMapLocationDot } from 'react-icons/fa6';
