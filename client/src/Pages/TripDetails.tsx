@@ -83,7 +83,7 @@ export default function TripDetails({ onClick }: TripProps) {
       navigate('/saved-trips');
     }
   }
-
+  // only show map loading spinner if map is set to show
   async function handleDeleteEvent(eventId: number) {
     try {
       await deleteEvent(Number(tripId), eventId);
@@ -100,13 +100,12 @@ export default function TripDetails({ onClick }: TripProps) {
       setError(error as Error);
     }
   }
-
+  // only need trip info from the first event to populate trip info
   const [{ tripName, startDate, endDate }] = trip;
 
-  let daysCount = 1;
   const startDateLuxon = DateTime.fromISO(new Date(startDate).toISOString());
   const endDateLuxon = DateTime.fromISO(new Date(endDate).toISOString());
-  daysCount =
+  const daysCount =
     Interval.fromDateTimes(startDateLuxon, endDateLuxon).length('days') + 1;
 
   const editTrip = {

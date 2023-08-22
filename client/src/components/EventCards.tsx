@@ -57,7 +57,7 @@ export default function EventCards({
                 <div className="flex items-center">
                   <div
                     className={`rounded-full w-6 h-6 border border-gray-300 bg-opacity-50`}
-                    style={{ background: `#${pinColors[i]}` }}>
+                    style={{ background: `#${pinColors[i % 10]}` }}>
                     <p className="text-center">{index + 1}</p>
                   </div>
                 </div>

@@ -3,7 +3,6 @@ import express from 'express';
 import errorMiddleware from './lib/error-middleware.js';
 import ClientError from './lib/client-error.js';
 import { authMiddleware } from './lib/authorization-middleware.js';
-// import { validateLoggedIn } from './lib/validate.js';
 import pg from 'pg';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
@@ -31,9 +30,6 @@ app.use(express.json());
 app.post('/api/auth/sign-up', async (req, res, next) => {
   try {
     const { username, password, firstName, lastName } = req.body;
-    // if (!username || !password || !firstName || !lastName) {
-    //   throw new ClientError(400, 'missing required fields');
-    // }
     validateParam([username, password, firstName, lastName]);
     const hashedPassword = await argon2.hash(password);
     const sql = `
@@ -105,6 +101,7 @@ app.get('/api/trips', authMiddleware, async (req, res, next) => {
   }
 });
 
+// get all events for a trip
 app.get('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
   try {
     const userId = validateLoggedIn(req.user);
@@ -140,6 +137,7 @@ app.get('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
   }
 });
 
+// create a trip
 app.post('/api/trip', authMiddleware, async (req, res, next) => {
   try {
     const userId = validateLoggedIn(req.user);
@@ -159,6 +157,7 @@ app.post('/api/trip', authMiddleware, async (req, res, next) => {
   }
 });
 
+// edit trip
 app.put('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
   try {
     const userId = validateLoggedIn(req.user);
@@ -187,6 +186,7 @@ app.put('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
   }
 });
 
+// delete trip
 app.delete('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
   try {
     const userId = validateLoggedIn(req.user);
@@ -219,6 +219,7 @@ app.delete('/api/trip/:tripId', authMiddleware, async (req, res, next) => {
   }
 });
 
+// create event for a trip
 app.post(`/api/trip/:tripId`, authMiddleware, async (req, res, next) => {
   const userId = validateLoggedIn(req.user);
   try {
@@ -242,7 +243,6 @@ app.post(`/api/trip/:tripId`, authMiddleware, async (req, res, next) => {
       startTime,
       endTime,
       location,
-      notes,
       placeId,
       lat,
       lng,
@@ -287,6 +287,7 @@ app.post(`/api/trip/:tripId`, authMiddleware, async (req, res, next) => {
   }
 });
 
+// get an event for a trip
 app.get(
   `/api/trip/:tripId/event/:eventId`,
   authMiddleware,
@@ -329,6 +330,7 @@ app.get(
   }
 );
 
+// edit event for a trip
 app.put(
   `/api/trip/:tripId/event/:eventId`,
   authMiddleware,
@@ -357,7 +359,6 @@ app.put(
         startTime,
         endTime,
         location,
-        notes,
         placeId,
         lat,
         lng,
@@ -415,6 +416,7 @@ app.put(
   }
 );
 
+// delete event for a trip
 app.delete(
   `/api/trip/:tripId/event/:eventId`,
   authMiddleware,

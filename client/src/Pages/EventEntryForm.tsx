@@ -29,7 +29,7 @@ type PlaceFields = {
   place_id: string;
   types: string[];
 };
-
+// use controlled form to display Google place results in notes after search
 export default function EventEntryForm() {
   let { tripId, eventId, startDate, endDate } = useParams();
   const [eventName, setEventName] = useState('');
@@ -74,7 +74,7 @@ export default function EventEntryForm() {
     }
     if (edit) readEvent();
   }, [eventId, tripId, edit]);
-
+  //creaate the date dropdown for each day of the trip
   if (startDate && endDate) {
     const startDateLuxon = DateTime.fromISO(new Date(startDate).toISOString());
     const endDateLuxon = DateTime.fromISO(new Date(endDate).toISOString());
@@ -95,6 +95,7 @@ export default function EventEntryForm() {
     setPlaceDetail(place.getPlace() as PlaceFields);
     const placeDetails = place?.getPlace() as PlaceFields;
     if (placeDetails && placeDetails.types.length > 1) {
+      // if types > 1 it's likely a business and will have addtional useful place properties
       const { name, formatted_address, formatted_phone_number, website } =
         placeDetails;
       const googleDetails = `\n${name}\n${formatted_address}${
@@ -102,7 +103,8 @@ export default function EventEntryForm() {
       }\n${website ?? ''}`;
       setNotes(googleDetails);
     } else {
-      setNotes('');
+      const googleDetails = `\n${placeDetails?.formatted_address ?? ''}`;
+      setNotes(googleDetails);
     }
   }
 
