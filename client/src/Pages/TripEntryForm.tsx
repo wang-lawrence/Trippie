@@ -80,6 +80,7 @@ export default function TripEntryForm() {
       <h1>{`${error instanceof Error ? error.message : 'Unknown Error'}`}</h1>
     );
 
+  // form code from shadcn component library
   return (
     <div className="bg-img">
       <div className="container">

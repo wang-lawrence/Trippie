@@ -22,8 +22,12 @@ export default function DaysTab({
       </div>
     );
   }
+  // when dayCounts gets over 12 the tabs will get hidden if justified center, so default justify and set overflow when > 12
   return (
-    <div className="flex w-full justify-center items-center mb-2">
+    <div
+      className={`flex w-[95%] items-center mb-2 ${
+        daysCount >= 12 ? 'overflow-scroll' : 'justify-center'
+      }`}>
       Day: {daysTabs}
     </div>
   );

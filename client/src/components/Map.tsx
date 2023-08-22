@@ -32,7 +32,7 @@ export default function Map({ trip, activeMapDays, startDate }: MapProps) {
           icon={{
             url: `https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=${
               index + 1
-            }|${pinColors[activeMapDays[i]]}|000000`,
+            }|${pinColors[activeMapDays[i] % 10]}|000000`,
           }}
         />
       );

@@ -2,6 +2,7 @@ import { Link, NavLink, Outlet } from 'react-router-dom';
 import { useContext } from 'react';
 import UserContext from './UserContext';
 
+// use NavLInk in instead of Link to target active tabs to bold in CSS file
 export default function NavBar() {
   const { user, handleSignOut } = useContext(UserContext);
   return (

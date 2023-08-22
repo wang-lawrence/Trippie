@@ -33,6 +33,10 @@ export const pinColors: Colors = {
   4: 'F0F8FF', // AliceBlue
   5: 'FF7F50', // Coral
   6: 'FF69B4', // HotPink
+  7: 'BADA55', // moss green
+  8: 'C6E2FF', // baby blue
+  9: 'E6E6FA', // lilac
+  10: 'FAEBD7', // beige
 };
 
 export type TripEntry = {
