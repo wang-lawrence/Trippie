@@ -53,6 +53,8 @@ export default function EventEntryForm() {
         setIsLoading(true);
         const { eventName, eventDate, startTime, endTime, notes, gPlace } =
           await fetchEvent(Number(tripId), Number(eventId));
+        setNotes(notes);
+        setPlaceDetail(JSON.parse(gPlace));
         setEventName(eventName);
         const eventDateFormatted = DateTime.fromISO(
           new Date(eventDate).toISOString()
@@ -64,8 +66,6 @@ export default function EventEntryForm() {
         setEndTime(
           DateTime.fromISO(endTime).toLocaleString(DateTime.TIME_24_SIMPLE)
         );
-        setNotes(notes);
-        setPlaceDetail(JSON.parse(gPlace));
       } catch (error) {
         setError(error);
       } finally {
