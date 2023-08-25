@@ -63,6 +63,9 @@ async function signUpOrIn(
     body: JSON.stringify({ username, password, firstName, lastName }),
   };
   const res = await fetch(`/api/auth/${action}`, req);
-  if (!res.ok) throw new Error(`fetch Error ${res.status}`);
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(`${err.error}`);
+  }
   return await res.json();
 }

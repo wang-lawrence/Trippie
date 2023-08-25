@@ -41,9 +41,9 @@ export default function AuthForm({ action, onSignIn }: Props) {
 
     try {
       if (action === 'sign-up') {
-        handleSignUp(username, password, firstName, lastName);
+        await handleSignUp(username, password, firstName, lastName);
       } else {
-        handleSignIn(username, password);
+        await handleSignIn(username, password);
       }
     } catch (err) {
       setError(err);
@@ -106,7 +106,7 @@ export default function AuthForm({ action, onSignIn }: Props) {
           autoFocus
           type="text"
           name="username"
-          className="w-[320px]"
+          className="w-[320px] mx-auto"
         />
       </div>
       <Label
@@ -119,7 +119,7 @@ export default function AuthForm({ action, onSignIn }: Props) {
         required
         type="password"
         name="password"
-        className="w-[320px]"
+        className="w-[320px] mx-auto"
       />
       <div className="flex justify-center items-center mt-3">
         <small>
@@ -138,8 +138,8 @@ export default function AuthForm({ action, onSignIn }: Props) {
       </div>
       <>
         {error && (
-          <div style={{ color: 'red' }}>
-            Error: {error instanceof Error ? error.message : 'Unknown Error'}
+          <div style={{ color: 'red' }} className="mt-4 text-center">
+            {error instanceof Error ? error.message : 'Unknown Error'}
           </div>
         )}
       </>
