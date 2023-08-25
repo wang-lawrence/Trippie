@@ -44,7 +44,6 @@ function App() {
       <UserContext.Provider value={contextValue}>
         <Routes>
           <Route path="/" element={<NavBar />}>
-            {/*replace with a home page once that's desgined*/}
             <Route index element={<HomePage />} />
             <Route path="trip-form" element={<TripEntryForm />} />
             <Route
