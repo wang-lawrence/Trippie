@@ -92,8 +92,9 @@ export default function EventEntryForm() {
 
   function handleSearch(place: GPlace) {
     setSearchResult(place);
+    if (!place.getPlace()) return;
     setPlaceDetail(place.getPlace() as PlaceFields);
-    const placeDetails = place?.getPlace() as PlaceFields;
+    const placeDetails = place.getPlace() as PlaceFields;
     if (placeDetails && placeDetails.types.length > 1) {
       // if types > 1 it's likely a business and will have addtional useful place properties
       const { name, formatted_address, formatted_phone_number, website } =

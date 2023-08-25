@@ -89,25 +89,35 @@ export default function EventCards({
           );
         }
       );
-    tripDays.push(
-      <>
-        {i !== 0 && <hr className="my-2" />}
-        <ul key={i}>
-          <span className="font-semibold text-sm">
-            {`Day ${i + 1} -
-            ${dateI.toLocaleString({
-              ...DateTime.DATE_SHORT,
-              weekday: 'long',
-            })}`}
-          </span>
-          {eventCards.length > 0 ? (
-            eventCards
-          ) : (
-            <li className="text-xs text-gray-400 mb-1">No Scheduled Events</li>
-          )}
-        </ul>
-      </>
-    );
+    tripDays.push(<EventDay eventCards={eventCards} i={i} dateI={dateI} />);
   }
   return <div>{tripDays}</div>;
+}
+
+type EventDayProps = {
+  eventCards: React.ReactNode[];
+  i: number;
+  dateI: DateTime;
+};
+
+function EventDay({ eventCards, i, dateI }: EventDayProps) {
+  return (
+    <div key={i}>
+      {i !== 0 && <hr className="my-2" />}
+      <ul>
+        <span className="font-semibold text-sm">
+          {`Day ${i + 1} -
+              ${dateI.toLocaleString({
+                ...DateTime.DATE_SHORT,
+                weekday: 'long',
+              })}`}
+        </span>
+        {eventCards.length > 0 ? (
+          eventCards
+        ) : (
+          <li className="text-xs text-gray-400 mb-1">No Scheduled Events</li>
+        )}
+      </ul>
+    </div>
+  );
 }
