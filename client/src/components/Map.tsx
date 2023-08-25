@@ -13,7 +13,7 @@ export default function Map({ trip, activeMapDays, startDate }: MapProps) {
   const lngPlaces: number[] = [];
 
   const startDateLuxon = DateTime.fromISO(new Date(startDate).toISOString());
-  let markers: any[] = [];
+  let markers: React.ReactNode[] = [];
 
   for (let i = 0; i < activeMapDays.length; i++) {
     const dateI = startDateLuxon.plus({ days: activeMapDays[i] });

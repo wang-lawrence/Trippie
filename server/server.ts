@@ -64,12 +64,12 @@ app.post('/api/auth/sign-in', async (req, res, next) => {
     const result = await db.query(sql, params);
     const [user] = result.rows;
     if (!user) {
-      throw new ClientError(401, 'invalid login');
+      throw new ClientError(401, 'Incorrect Username and/or Password');
     }
     const { userId, hashedPassword, firstName, lastName } = user;
     const isMatching = await argon2.verify(hashedPassword, password);
     if (!isMatching) {
-      throw new ClientError(401, 'invalid login');
+      throw new ClientError(401, 'Incorrect Username and/or Password');
     }
     const payload = { userId, username, firstName, lastName };
     if (!process.env.TOKEN_SECRET) {
