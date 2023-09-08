@@ -50,11 +50,13 @@ Try the application live at [https://trippie.lawrencewang.dev/](https://trippie.
 
 ## Preview
 
+### Users can view the Google Map location of each event
 ![View Map Feature](https://trippie.lawrencewang.dev/view-map.gif)
 
+### Users can add an event for a trip
 ![View Map Feature](https://trippie.lawrencewang.dev/add-event.gif)
 
-## Stretch Features
+## Future Stretch Features
 - Users can view routing between markers on map.
 - Users can add multiple users to a trip.
   
