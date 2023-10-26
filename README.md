@@ -4,7 +4,7 @@ A PERN-stack web application for vacationers to plan and visualize their travel 
 
 ## Why I Built This
 
-I enjoy traveling and experiencing new places and cultures, but my friends and family often found ourselves planning on spreadsheets or through texts. I wanted to create an app that will help us easily origanize and share future travel plans. 
+I enjoy traveling and experiencing new places and cultures, but my friends and family often found ourselves planning on spreadsheets or through texts. I wanted to create an app that will help us easily organize and share future travel plans. 
 
 ## Live Demo
 
